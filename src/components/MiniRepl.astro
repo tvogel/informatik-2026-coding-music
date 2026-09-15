@@ -1,0 +1,291 @@
+---
+interface Props {
+  name?: string;
+  tune?: string;
+}
+
+const { name, tune = "" } = Astro.props;
+const hasDefaultTune = tune.trim().length > 0;
+---
+
+<RootElement>
+  <div class="root not-content" data-mini-repl data-mini-repl-name={name}>
+    <div class="editor-pane">
+      <div class="controls">
+        <div class="controls__group controls__group--transport">
+          <button
+            aria-label="Start"
+            data-target="start"
+            title="Start"
+            type="button"
+          >
+            <span aria-hidden="true">▶</span>
+          </button>
+          <button
+            aria-label="Stop"
+            data-target="stop"
+            title="Stop"
+            type="button"
+          >
+            <span aria-hidden="true">■</span>
+          </button>
+        </div>
+        <div class="controls__group">
+          <button
+            aria-label="Undo"
+            data-target="undo"
+            title="Undo"
+            type="button"
+          >
+            <span aria-hidden="true">↶</span>
+          </button>
+          <button
+            aria-label="Redo"
+            data-target="redo"
+            title="Redo"
+            type="button"
+          >
+            <span aria-hidden="true">↷</span>
+          </button>
+        </div>
+      </div>
+      <div data-target="strudel" data-default-tune={tune}></div>
+    </div>
+
+    {
+      hasDefaultTune && (
+        <aside class="code-pane" aria-label="Original tune">
+          <button
+            aria-label="Reset to this original tune"
+            class="code-pane__reset"
+            data-target="reset"
+            title="Reset to this original tune"
+            type="button"
+          >
+            <span aria-hidden="true">↺</span>
+          </button>
+          <div data-target="reference" data-default-tune={tune} />
+        </aside>
+      )
+    }
+  </div>
+</RootElement>
+
+<script>
+  import "@strudel/repl";
+
+  RootElement.ready(($) => {
+    const strudel = $("strudel");
+    const reference = $.optional("reference");
+    if (!strudel) return;
+
+    const defaultTune = strudel.dataset.defaultTune ?? "";
+    const root = strudel.closest("[data-mini-repl]");
+    const replName = root?.getAttribute("data-mini-repl-name")?.trim() ?? "";
+    const replNodes = Array.from(document.querySelectorAll("[data-mini-repl]"));
+    const replIndex = root ? replNodes.indexOf(root) : -1;
+    const storageKeySuffix = replName || String(replIndex);
+    const storageKey = `mini-repl:${window.location.pathname}:${storageKeySuffix}`;
+
+    const readStoredTune = () => {
+      try {
+        return window.localStorage.getItem(storageKey);
+      } catch {
+        return null;
+      }
+    };
+
+    const writeStoredTune = (code: string) => {
+      try {
+        window.localStorage.setItem(storageKey, code);
+      } catch {
+        // Ignore storage failures such as private mode restrictions.
+      }
+    };
+
+    const initialTune = readStoredTune() ?? strudel.dataset.tune ?? defaultTune;
+    strudel.dataset.tune = initialTune;
+
+    const repl = document.createElement("strudel-editor") as HTMLElement & {
+      editor?: {
+        editor?: {
+          contentDOM?: HTMLElement;
+          focus?: () => void;
+        };
+        evaluate: () => void;
+        stop: () => void;
+      };
+    };
+
+    repl.setAttribute("code", initialTune);
+    strudel.append(repl);
+
+    repl.addEventListener("update", ((event: Event) => {
+      const detail = (event as CustomEvent<{ code?: string }>).detail;
+      const code = detail.code ?? "";
+      strudel.dataset.tune = code;
+      writeStoredTune(code);
+    }) as EventListener);
+
+    const triggerHistoryAction = (inputType: "historyUndo" | "historyRedo") => {
+      const view = repl.editor?.editor;
+      const target = view?.contentDOM;
+      if (!target) return;
+
+      view?.focus?.();
+      target.dispatchEvent(
+        new InputEvent("beforeinput", {
+          bubbles: true,
+          cancelable: true,
+          inputType,
+        }),
+      );
+    };
+
+    if (reference) {
+      const referenceRepl = document.createElement(
+        "strudel-editor",
+      ) as HTMLElement & {
+        editor?: {
+          editor?: {
+            dispatch: (value: { effects: unknown }) => void;
+          };
+        };
+      };
+
+      referenceRepl.setAttribute("code", defaultTune);
+      reference.append(referenceRepl);
+
+      const lockReferenceEditor = () => {
+        const referenceEditor = referenceRepl.editor?.editor as any;
+        if (!referenceEditor?.contentDOM) return;
+
+        referenceEditor.contentDOM.setAttribute("contenteditable", "false");
+        referenceEditor.contentDOM.setAttribute("aria-readonly", "true");
+        referenceEditor.dom?.classList.add("is-readonly-view");
+        referenceEditor.dom?.classList.remove("cm-focused");
+      };
+
+      referenceRepl.addEventListener(
+        "update",
+        lockReferenceEditor as EventListener,
+      );
+      queueMicrotask(lockReferenceEditor);
+    }
+
+    $("start").addEventListener("click", () => {
+      repl.editor?.evaluate();
+    });
+
+    $("stop").addEventListener("click", () => {
+      repl.editor?.stop();
+    });
+
+    $("undo").addEventListener("click", () => {
+      triggerHistoryAction("historyUndo");
+    });
+
+    $("redo").addEventListener("click", () => {
+      triggerHistoryAction("historyRedo");
+    });
+
+    const reset = $.optional("reset");
+    reset?.addEventListener("click", () => {
+      strudel.dataset.tune = defaultTune;
+      writeStoredTune(defaultTune);
+      repl.setAttribute("code", defaultTune);
+    });
+  });
+</script>
+
+<style>
+  .root {
+    display: grid;
+    gap: 1rem;
+    padding: 0.5rem;
+  }
+
+  .editor-pane,
+  .code-pane {
+    min-width: 0;
+  }
+
+  .editor-pane {
+    position: relative;
+    display: grid;
+    gap: 0.75rem;
+    padding-top: 2.75rem;
+  }
+
+  .controls {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.875rem;
+  }
+
+  .controls__group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .controls button,
+  .code-pane__reset {
+    min-width: 2.5rem;
+    padding: 0.35rem 0.55rem;
+    line-height: 1;
+  }
+
+  .controls button span,
+  .code-pane__reset span {
+    display: inline-block;
+    font-size: 1rem;
+  }
+
+  .code-pane {
+    position: relative;
+    min-height: 0;
+    padding-top: 2.75rem;
+  }
+
+  .code-pane__reset {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    white-space: nowrap;
+  }
+
+  .code-pane :global(.cm-editor) {
+    min-height: 100%;
+  }
+
+  .code-pane :global(.cm-scroller) {
+    min-height: 100%;
+  }
+
+  @media (min-width: 900px) {
+    .root {
+      grid-template-columns: minmax(0, 1.5fr) minmax(18rem, 1fr);
+      align-items: start;
+    }
+
+    .editor-pane {
+      grid-column: 1;
+    }
+
+    .code-pane {
+      grid-column: 2;
+    }
+  }
+
+  @media (max-width: 899px) {
+    .code-pane {
+      max-height: 20rem;
+    }
+  }
+</style>
