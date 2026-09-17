@@ -5,6 +5,8 @@ import starlight from '@astrojs/starlight';
 import simplestackQuery from '@simplestack/query';
 import pwa from './src/integrations/pwa';
 
+import mdx from '@astrojs/mdx';
+
 // https://astro.build/config
 export default defineConfig({
   integrations: [starlight({
@@ -29,9 +31,7 @@ export default defineConfig({
     customCss: [
       './src/styles/custom.css',
     ],
-  }),
-  simplestackQuery(),
-  pwa({
+  }), mdx(), simplestackQuery(), pwa({
     experimental: { directoryAndTrailingSlashHandler: true },
     registerType: 'autoUpdate',
     injectRegister: 'auto',
@@ -99,6 +99,5 @@ export default defineConfig({
       //   },
       // ],
     },
-  }),
-  ],
+  })],
 });
