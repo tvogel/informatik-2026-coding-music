@@ -23,9 +23,6 @@ importers:
       '@strudel/webaudio':
         specifier: ^1.3.0
         version: 1.3.0
-      '@strudel/website':
-        specifier: link:../strudel/website
-        version: link:../strudel/website
       astro:
         specifier: ^7.3.2
         version: 7.3.2(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@24.13.3)(terser@5.51.2)(yaml@2.9.1)

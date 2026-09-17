@@ -15,7 +15,6 @@
     "@simplestack/query": "^0.3.0",
     "@strudel/repl": "^1.3.0",
     "@strudel/webaudio": "^1.3.0",
-    "@strudel/website": "link:../strudel/website",
     "astro": "^7.3.2",
     "dedent": "^1.7.2",
     "sharp": "^0.35.3",
