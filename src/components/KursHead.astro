@@ -15,5 +15,5 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
 <link rel="mask-icon" href={`${basePath}favicon.svg`} color="#FFFFFF" />
 <meta name="msapplication-TileColor" content="#FFFFFF" />
 <meta name="theme-color" content="#ffffff" />
-<script src={`${basePath}src/pwa.ts`}></script>
+<script src="/src/pwa.ts"></script>
 {pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
