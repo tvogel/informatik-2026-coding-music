@@ -4,8 +4,7 @@ description: Reproducer for missing pianoroll on load
 ---
 import MiniRepl from '../../../components/MiniRepl.astro';
 
-<MiniRepl name='pianoroll_bug' tune={`
-  setcpm(135/4)
+<MiniRepl name='pianoroll_bug' tune={`setcpm(135/4)
   $: s(\`bd ~  bd ~,
         ~  sd  ~  sd\`)
      ._pianoroll({labels: true}).n(4);
