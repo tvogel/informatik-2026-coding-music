@@ -128,25 +128,34 @@ function manifestTransform(ctx: PWAContext): ManifestTransform {
   return async (entries) => {
     if (!ctx.built) return { manifest: entries, warnings: [] };
 
+    const extraEntries = [];
+
     for (const entry of entries) {
       if (!entry?.url.endsWith(".html")) continue;
 
       const url = entry.url.startsWith("/") ? entry.url.slice(1) : entry.url;
       if (url === "index.html") {
-        entry.url = ctx.scope;
+        extraEntries.push({
+          ...entry,
+          url: ctx.scope,
+        });
         continue;
       }
 
       const parts = url.split("/");
       parts[parts.length - 1] = parts[parts.length - 1].replace(/\.html$/, "");
-      entry.url = ctx.directoryFormat
+      let newUrl = ctx.directoryFormat
         ? parts.length > 1
           ? parts.slice(0, -1).join("/")
           : parts[0]
         : parts.join("/");
-      if (ctx.trailingSlash === "always") entry.url += "/";
+      if (ctx.trailingSlash === "always") newUrl += "/";
+      extraEntries.push({
+        ...entry,
+        url: newUrl,
+      });
     }
 
-    return { manifest: entries, warnings: [] };
+    return { manifest: [...entries, ...extraEntries], warnings: [] };
   };
 }
