@@ -7,8 +7,6 @@ import pwa from './src/integrations/pwa';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://tvogel.github.io',
-  base: '/informatik-2026-coding-music',
   integrations: [starlight({
     title: 'Informatik 10-12/2026: Music Live Coding',
     social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
