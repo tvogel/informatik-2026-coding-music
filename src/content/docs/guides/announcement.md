@@ -8,3 +8,6 @@ In fast allen populären Musikstilen, im Film, in Computerspielen, in den sozial
 In diesem Kurs lade ich Dich ein, die neue **Computersprache** [`strudel.cc`](https://strudel.cc) kennenzulernen, mit der man **musikalische Strukturen** (Rhythmen, Harmonien, Tonarten, Melodien, Effekte, Variationen, ...) als **Programm** schreiben kann.
 
 Wir sehen uns dabei auch an, wie **Tonsignale** im Computer dargestellt und verarbeitet werden.
+
+---
+September 2026, T. Vogel
