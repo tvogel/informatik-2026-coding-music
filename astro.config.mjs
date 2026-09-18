@@ -10,20 +10,21 @@ import mdx from '@astrojs/mdx';
 // https://astro.build/config
 export default defineConfig({
   integrations: [starlight({
-    title: 'Informatik 10-12/2026: Music Live Coding',
+    title: 'Informatik 10-12/2026: Coding Music',
     social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
     sidebar: [
       {
-        label: 'Guides',
+        label: 'Dokumente',
         items: [
           // Each item here is one entry in the navigation menu.
+          { label: 'Ankündigung', slug: 'guides/announcement' },
           { label: 'Example Guide', slug: 'guides/example' },
           { label: 'Pianoroll bug', slug: 'guides/bug' },
         ],
       },
       {
-        label: 'Reference',
-        items: [{ autogenerate: { directory: 'reference' } }],
+        label: 'Übungen',
+        items: [{ autogenerate: { directory: 'exercises' } }],
       },
     ],
     components: {
@@ -68,10 +69,10 @@ export default defineConfig({
     },
     manifest: {
       // includeAssets: ['favicon.ico', 'icons/apple-icon-180.png'],
-      name: 'Informatik 10-12/2026: Music Live Coding',
+      name: 'Informatik 10-12/2026: Coding Music',
       short_name: 'Informatik 10-12/2026',
       description:
-        'Kursmaterial für "Informatik 10-12/2026: Music Live Coding" an der Freien Waldorfschule Werder',
+        'Kursmaterial für "Informatik 10-12/2026: Coding Music" an der Freien Waldorfschule Werder',
       theme_color: '#222222',
       // icons: [
       //   {
