@@ -34,7 +34,6 @@ export default defineConfig({
       './src/styles/custom.css',
     ],
   }), mdx(), simplestackQuery(), pwa({
-    experimental: { directoryAndTrailingSlashHandler: true },
     registerType: 'autoUpdate',
     injectRegister: 'auto',
     workbox: {
