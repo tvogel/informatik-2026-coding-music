@@ -10,15 +10,21 @@ import mdx from '@astrojs/mdx';
 // https://astro.build/config
 export default defineConfig({
   integrations: [starlight({
+    locales: {
+      root: {
+        label: 'Deutsch',
+        lang: 'de',
+      }
+    },
     title: 'Informatik 10-12/2026: Coding Music',
     social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
     sidebar: [
       {
-        label: 'Dokumente',
+        label: 'Kurs',
         items: [
           // Each item here is one entry in the navigation menu.
           { label: 'Ankündigung', slug: 'guides/announcement' },
-          { label: 'Example Guide', slug: 'guides/example' },
+          { label: 'Willkommen', slug: 'guides/welcome' },
           { label: 'Pianoroll bug', slug: 'guides/bug' },
         ],
       },

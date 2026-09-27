@@ -1,0 +1,37 @@
+---
+title: "Übungen 1: Einfache Beats"
+description: Übungen zum Erstellen einfacher Beats.
+---
+import VexFlow from "../../../components/VexFlow.astro";
+
+## Score 1
+<VexFlow code={`(VexFlow, factory) => {
+    VexFlow.setFonts("Bravura");
+    const score = factory.EasyScore();
+    factory
+      .System()
+      .addStave({
+        voices: [
+          score.voice(score.notes("C#5/q, B4, A4, G#4", { stem: "up" })),
+          score.voice(score.notes("C#4/h, C4/q, C4/q", { stem: "down" })),
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+## Score 2
+<VexFlow code={`(VexFlow, factory) => {
+    VexFlow.setFonts("Bravura");
+    const score = factory.EasyScore();
+    factory
+      .System()
+      .addStave({
+        voices: [
+          score.voice(score.notes("C#5/q, B4, A4, G#4", { stem: "up" })),
+          score.voice(score.notes("C#4/h, C#4", { stem: "down" })),
+        ],
+      })
+      .addClef("treble")
+      .addTimeSignature("4/4");
+}`} />

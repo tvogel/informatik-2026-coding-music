@@ -1,0 +1,86 @@
+---
+interface Props {
+  code: string;
+  width?: number;
+  height?: number;
+}
+
+const { code, width = 500, height = 130 } = Astro.props;
+const id = crypto.randomUUID();
+---
+
+<RootElement
+  ><div
+    class="vexflow-target"
+    id={id}
+    data-target="vexflow"
+    data-code={code}
+    data-width={width}
+    data-height={height}
+  >
+  </div></RootElement
+>
+<script>
+  import VexFlow, { Factory } from "vexflow";
+
+  function setFgColor(factory: Factory, fgColor: string) {
+    factory.getStave()?.setStyle({
+      strokeStyle: fgColor,
+      fillStyle: fgColor,
+    });
+    factory.getStave()?.setDefaultLedgerLineStyle({
+      strokeStyle: fgColor,
+      fillStyle: fgColor,
+    });
+    factory.getVoices().forEach((voice) => {
+      voice.setStyle({
+        strokeStyle: fgColor,
+        fillStyle: fgColor,
+      });
+      voice.getTickables().forEach((tickable) => {
+        tickable.setStyle({
+          strokeStyle: fgColor,
+          fillStyle: fgColor,
+        });
+      });
+    });
+  }
+
+  RootElement.ready(($) => {
+    const target = $("vexflow");
+    const code = target.dataset.code ?? "";
+    const width = Number(target.dataset.width ?? 500);
+    const height = Number(target.dataset.height ?? 130);
+
+    const func = new Function(`return (${code})`)();
+
+    const factory = new VexFlow.Factory({
+      renderer: { elementId: target.id, width, height },
+    });
+
+    function render() {
+      target.replaceChildren();
+
+      const style = window.getComputedStyle(document.body);
+      const fgColor = style.getPropertyValue("--sl-color-text") || "white";
+      factory.initRenderer();
+      func(VexFlow, factory);
+      setFgColor(factory, fgColor);
+      factory.draw();
+    }
+
+    const observer = new MutationObserver(render);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+    render();
+  });
+</script>
+
+<style>
+  .vexflow-target {
+    /* background-color: grey; */
+    padding: 1rem;
+  }
+</style>
