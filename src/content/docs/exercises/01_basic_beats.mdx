@@ -8,18 +8,21 @@ import VexFlow from "../../../components/VexFlow.astro";
 <VexFlow code={`(VexFlow, factory) => {
     VexFlow.setFonts("Bravura");
     const score = factory.EasyScore();
+    const hhhh = () => score.beam(score.notes("G5/8/m, G5/8/m", { stem: "up"}));
+    const bd = () => score.notes("F4/q", { stem: "down" });
+    const sd = () => score.notes("C5/q", { stem: "down" });
     factory
       .System()
       .addStave({
         voices: [
-          score.voice(score.notes("C#5/q, B4, A4, G#4", { stem: "up" })),
-          score.voice(score.notes("C#4/h, C4/q, C4/q", { stem: "down" })),
+          score.voice([hhhh(), hhhh(), hhhh(), hhhh()].flat()),
+          score.voice([bd(), sd(), bd(), sd()].flat()),
         ],
       })
       .addClef("percussion")
       .addTimeSignature("4/4");
   }`} />
-
+test
 ## Score 2
 <VexFlow code={`(VexFlow, factory) => {
     VexFlow.setFonts("Bravura");

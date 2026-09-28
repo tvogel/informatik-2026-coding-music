@@ -24,24 +24,18 @@ const id = crypto.randomUUID();
   import VexFlow, { Factory } from "vexflow";
 
   function setFgColor(factory: Factory, fgColor: string) {
-    factory.getStave()?.setStyle({
+    const fgStyle = {
       strokeStyle: fgColor,
       fillStyle: fgColor,
-    });
-    factory.getStave()?.setDefaultLedgerLineStyle({
-      strokeStyle: fgColor,
-      fillStyle: fgColor,
-    });
+    };
+    factory.getStave()?.setStyle(fgStyle);
+    factory.getStave()?.setDefaultLedgerLineStyle(fgStyle);
     factory.getVoices().forEach((voice) => {
-      voice.setStyle({
-        strokeStyle: fgColor,
-        fillStyle: fgColor,
-      });
+      voice.setStyle(fgStyle);
       voice.getTickables().forEach((tickable) => {
-        tickable.setStyle({
-          strokeStyle: fgColor,
-          fillStyle: fgColor,
-        });
+        tickable.setStyle(fgStyle);
+        if (tickable instanceof VexFlow.Note)
+          tickable.getBeam()?.setStyle(fgStyle);
       });
     });
   }
@@ -80,7 +74,6 @@ const id = crypto.randomUUID();
 
 <style>
   .vexflow-target {
-    /* background-color: grey; */
     padding: 1rem;
   }
 </style>
