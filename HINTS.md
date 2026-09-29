@@ -1,0 +1,2 @@
+- Read [about how-to guides](https://diataxis.fr/how-to-guides/) in the Diátaxis framework
+- Read [about reference](https://diataxis.fr/reference/) in the Diátaxis framework

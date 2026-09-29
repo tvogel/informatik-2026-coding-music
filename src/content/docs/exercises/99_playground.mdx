@@ -1,0 +1,24 @@
+---
+title: Playground
+---
+import MiniRepl from "../../../components/MiniRepl.astro";
+import dedent from "dedent";
+
+<MiniRepl
+  name="drums"
+  tune={dedent`
+    $: s(\`bd ~  bd ~,
+          ~  sd  ~  sd,
+          hh*8
+         \`)`}
+/>
+
+<MiniRepl
+  name="piano"
+  tune={dedent`
+    $: s(\`piano
+         \`)`}
+/>
+
+<MiniRepl name="playground" />
+

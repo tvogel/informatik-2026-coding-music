@@ -3,17 +3,32 @@ title: "Übungen 1: Einfache Beats"
 description: Übungen zum Erstellen einfacher Beats.
 ---
 import VexFlow from "../../../components/VexFlow.astro";
+import { LinkCard } from '@astrojs/starlight/components';
+import MiniRepl from "../../../components/MiniRepl.astro";
+import dedent from "dedent";
+
+## Kleiner Exkurs: Schlagzeug-Noten
+
+<LinkCard title="Drum Notation Guide" description="Kompakter Überblick über Schlagzeug-Noten" href="https://www.onlinedrummer.com/pages/drum-key" />
+
+## Vier Viertel Bass-Drum
+
+<MiniRepl
+  name="44bd"
+  tune={dedent`
+    $: s(\`bd bd bd bd\`)`}
+/>
+
 
 ## Score 1
-<VexFlow code={`(VexFlow, factory) => {
-    VexFlow.setFonts("Bravura");
-    const score = factory.EasyScore();
+
+<VexFlow code={`(VexFlow, factory, score) => {
+    const system = factory.System();
     const hhhh = () => score.beam(score.notes("G5/8/m, G5/8/m", { stem: "up"}));
-    const bd = () => score.notes("F4/q", { stem: "down" });
-    const sd = () => score.notes("C5/q", { stem: "down" });
-    factory
-      .System()
-      .addStave({
+    const bd = () => score.notes("F4/q", /*{ stem: "down" }*/);
+    const sd = () => score.notes("C5/q", /*{ stem: "down" }*/);
+    system.addStave({
+        spaceAbove: 1,
         voices: [
           score.voice([hhhh(), hhhh(), hhhh(), hhhh()].flat()),
           score.voice([bd(), sd(), bd(), sd()].flat()),
@@ -22,11 +37,9 @@ import VexFlow from "../../../components/VexFlow.astro";
       .addClef("percussion")
       .addTimeSignature("4/4");
   }`} />
-test
+
 ## Score 2
-<VexFlow code={`(VexFlow, factory) => {
-    VexFlow.setFonts("Bravura");
-    const score = factory.EasyScore();
+<VexFlow code={`(VexFlow, factory, score) => {
     factory
       .System()
       .addStave({

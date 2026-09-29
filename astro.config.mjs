@@ -25,6 +25,7 @@ export default defineConfig({
           // Each item here is one entry in the navigation menu.
           { label: 'Ankündigung', slug: 'guides/announcement' },
           { label: 'Willkommen', slug: 'guides/welcome' },
+          { label: 'Erste Schritte', slug: 'guides/first_steps' },
           { label: 'Pianoroll bug', slug: 'guides/bug' },
         ],
       },

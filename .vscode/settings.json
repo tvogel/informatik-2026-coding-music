@@ -18,10 +18,12 @@
     "precache",
     "precaches",
     "setcpm",
+    "seti",
     "shabda",
     "simplestack",
     "tickable",
     "Tickables",
+    "Verzerrer",
     "vexflow"
   ]
 }

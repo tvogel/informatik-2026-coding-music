@@ -19,7 +19,7 @@ const hasDefaultTune = tune.trim().length > 0;
             title="Start"
             type="button"
           >
-            <span aria-hidden="true">▶</span>
+            <span aria-hidden="true">►</span>
           </button>
           <button
             aria-label="Stop"
@@ -32,17 +32,17 @@ const hasDefaultTune = tune.trim().length > 0;
         </div>
         <div class="controls__group">
           <button
-            aria-label="Undo"
+            aria-label="Rückgängig"
             data-target="undo"
-            title="Undo"
+            title="Rückgängig"
             type="button"
           >
             <span aria-hidden="true">↶</span>
           </button>
           <button
-            aria-label="Redo"
+            aria-label="Wiederholen"
             data-target="redo"
-            title="Redo"
+            title="Wiederholen"
             type="button"
           >
             <span aria-hidden="true">↷</span>
@@ -56,10 +56,10 @@ const hasDefaultTune = tune.trim().length > 0;
       hasDefaultTune && (
         <aside class="code-pane" aria-label="Original tune">
           <button
-            aria-label="Reset to this original tune"
+            aria-label="Diesen Original-Code wiederherstellen"
             class="code-pane__reset"
             data-target="reset"
-            title="Reset to this original tune"
+            title="Diesen Original-Code wiederherstellen"
             type="button"
           >
             <span aria-hidden="true">↺</span>

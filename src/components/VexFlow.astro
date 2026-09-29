@@ -5,7 +5,7 @@ interface Props {
   height?: number;
 }
 
-const { code, width = 500, height = 130 } = Astro.props;
+const { code, width = 500, height = 180 } = Astro.props;
 const id = crypto.randomUUID();
 ---
 
@@ -40,11 +40,16 @@ const id = crypto.randomUUID();
     });
   }
 
+  function commitHook(obj: any, note: any, builder: any) {
+    if ("art" in obj)
+      note.addModifier(builder.factory.Articulation({ type: obj.art }));
+  }
+
   RootElement.ready(($) => {
     const target = $("vexflow");
     const code = target.dataset.code ?? "";
     const width = Number(target.dataset.width ?? 500);
-    const height = Number(target.dataset.height ?? 130);
+    const height = Number(target.dataset.height ?? 180);
 
     const func = new Function(`return (${code})`)();
 
@@ -58,8 +63,11 @@ const id = crypto.randomUUID();
       const style = window.getComputedStyle(document.body);
       const fgColor = style.getPropertyValue("--sl-color-text") || "white";
       factory.initRenderer();
-      func(VexFlow, factory);
+      const score = factory.EasyScore({ commitHooks: [commitHook] });
+      VexFlow.setFonts("Bravura");
+      func(VexFlow, factory, score);
       setFgColor(factory, fgColor);
+      factory.getContext().scale(1.25, 1.25);
       factory.draw();
     }
 

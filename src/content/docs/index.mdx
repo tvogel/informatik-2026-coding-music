@@ -3,64 +3,43 @@ title: 'Informatik 10-12/2026: Coding Music'
 description: 'Kursmaterial für "Informatik 10-12/2026: Coding Music" an der Freien Waldorfschule Werder.'
 # template: splash # Remove or comment out this line to display the site sidebar on this page.
 hero:
-  tagline: Congrats on setting up a new Starlight project!
+  tagline: Willkommen beim Wahlfach Informatik!
   image:
-    file: ../../assets/houston.webp
+    file: ../../assets/strudel_icon.png
   actions:
-    - text: Example Guide
-      link: /guides/example/
+    - text: Hier geht's los!
+      link: /guides/welcome/
       icon: right-arrow
-    - text: Read the Starlight docs
-      link: https://starlight.astro.build
+    - text: Übungen
+      link: exercises/01_basic_beats/
+      icon: puzzle
+      variant: secondary
+    - text: Strudel-Dokumentation
+      link: https://strudel.cc/learn
+      icon: external
+      variant: minimal
+    - text: Strudel-REPL
+      link: https://strudel.cc/
       icon: external
       variant: minimal
 ---
-
-## Further reading
-
-- Read [about how-to guides](https://diataxis.fr/how-to-guides/) in the Diátaxis framework
-
-## Playground
-
 import { Card, CardGrid } from "@astrojs/starlight/components";
-import MiniRepl from "../../components/MiniRepl.astro";
-import dedent from "dedent";
 
-<MiniRepl
-  name="drums"
-  tune={dedent`
-    $: s(\`bd ~  bd ~,
-          ~  sd  ~  sd,
-          hh*8
-         \`)`}
-/>
-
-<MiniRepl
-  name="piano"
-  tune={dedent`
-    $: s(\`piano
-         \`)`}
-/>
-
-<MiniRepl name="playground" />
-
-## Next steps
-
+## Themen
 <CardGrid stagger>
-  <Card title="Update content" icon="pencil">
-    Edit `src/content/docs/index.mdx` to see this page change.
+  <Card title="Beats" icon="database">
+  Rhythmen, Schlagzeug-Noten, Live-Variationen
   </Card>
-  <Card title="Change page layout" icon="document">
-    Delete `template: splash` in `src/content/docs/index.mdx` to display a
-    sidebar on this page.
+  <Card title="Melodien" icon="notes">
+  Harmonien, Akkorde, Tonleitern
   </Card>
-  <Card title="Add new content" icon="add-document">
-    Add Markdown or MDX files to `src/content/docs` to create new pages.
+  <Card title="Effekte" icon="analytics">
+    High-pass, Low-pass, Echo, Hall, Limiter, Verzerrer
   </Card>
-  <Card title="Configure your site" icon="setting">
-    Edit your `sidebar` and other config in `astro.config.mjs`.
+  <Card title="Audio-Signale" icon="seti:audio">
+    Schall, Abtastung, Auflösung, Stereo, Samples, Frequenz-Spektrum
   </Card>
-  <Card title="Read the docs" icon="open-book">
-    Learn more in [the Starlight Docs](https://starlight.astro.build/).
+  <Card title="Algorithmen" icon="setting">
+    Umkehrung, Variation, Zufall, Ton-Synthese
   </Card>
 </CardGrid>
