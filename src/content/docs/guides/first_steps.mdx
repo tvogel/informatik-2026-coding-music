@@ -5,8 +5,8 @@ import MiniRepl from "../../../components/MiniRepl.astro";
 
 - ist eine deklarative Sprache: Was ist das "Problem"? \
   (Kontrast imperative Sprache: Was ist zu tun?)
-- ist selbst in einer JavaScript geschrieben
-- basiert auf *Tidal Cycles* (geschrieben in Haskell)
+- ist selbst in JavaScript geschrieben (imperativ)
+- basiert auf [*Tidal Cycles*](https://tidalcycles.org/), geschrieben in Haskell (deklarativ)
 - begründet von Alex McLean (2022) unter intensiver Mitarbeit von Felix Roos
 - wird von der Community weiterentwickelt mit großen Beiträgen von Switch Angel (Jade Rose Rowland) und dem Aria-Projekt
 
@@ -20,7 +20,7 @@ import MiniRepl from "../../../components/MiniRepl.astro";
 
 Der REPL läuft direkt im Browser und hat folgende Bedienelemente:
 
-<MiniRepl tune={`s("crow")`}/>
+<MiniRepl name="first-crow" tune={`s("crow")`}/>
 
 Mit den Tasten über dem ersten Feld kann man die Auswertung und Tonausgabe starten und stoppen. Man kann mit den beiden Pfeilen daneben Änderungen rückgängig machen oder wieder herstellen.
 
