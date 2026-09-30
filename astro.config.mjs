@@ -1,8 +1,10 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
-
+import starlightQuiz from 'starlight-quiz';
 import simplestackQuery from '@simplestack/query';
+
+import { defineConfig } from 'astro/config'
+  ;
 import pwa from './src/integrations/pwa';
 
 import mdx from '@astrojs/mdx';
@@ -26,12 +28,19 @@ export default defineConfig({
           { label: 'Ankündigung', slug: 'guides/announcement' },
           { label: 'Willkommen', slug: 'guides/welcome' },
           { label: 'Erste Schritte', slug: 'guides/first_steps' },
-          { label: 'Pianoroll bug', slug: 'guides/bug' },
+          { label: 'Schlagzeug-Noten', slug: 'guides/drum_notation' },
+          // { label: 'Pianoroll bug', slug: 'guides/bug' },
         ],
       },
       {
         label: 'Übungen',
         items: [{ autogenerate: { directory: 'exercises' } }],
+      },
+      {
+        label: 'Dokumentation',
+        items: [
+          { label: 'Strudel', link: 'https://strudel.cc/learn' }
+        ],
       },
     ],
     components: {
@@ -40,6 +49,7 @@ export default defineConfig({
     customCss: [
       './src/styles/custom.css',
     ],
+    plugins: [starlightQuiz()],
   }), mdx(), simplestackQuery(), pwa({
     registerType: 'autoUpdate',
     injectRegister: 'auto',

@@ -1,0 +1,64 @@
+---
+interface Props {
+  name?: string;
+  minLines?: number;
+}
+
+const { name, minLines } = Astro.props;
+const route = Astro.url.pathname;
+---
+
+<RootElement>
+  <textarea
+    data-target="root"
+    data-answer
+    data-answer-name={name}
+    data-route={route}><slot/></textarea
+  >
+</RootElement>
+
+<script>
+  import {
+    makeStorageKey,
+    readLocalStorage,
+    writeLocalStorage,
+  } from "../lib/localStorage";
+
+  RootElement.ready(($) => {
+    const root = $<HTMLTextAreaElement>("root");
+    const storageKey = makeStorageKey(
+      "answer",
+      root,
+      "[data-answer]",
+      root?.dataset.answerName,
+    );
+
+    const answer = readLocalStorage(storageKey) ?? root.dataset.answer ?? "";
+    console.log({ route: root.dataset.route, storageKey, answer });
+    root.dataset.answer = answer;
+
+    root.value = answer;
+
+    root.addEventListener("input", ((event: Event) => {
+      const target = event.target as HTMLTextAreaElement;
+      const text = target.value ?? "";
+      writeLocalStorage(storageKey, text);
+    }) as EventListener);
+  });
+</script>
+
+<style define:vars={{ minLines }}>
+  textarea[data-answer] {
+    --padding: 0.5rem;
+    --border-width: 1px;
+    margin-top: var(--padding);
+    width: 100%;
+    min-height: calc(
+      var(--minLines, 1) * 1lh + 2 * var(--padding) + 2 * var(--border-width)
+    );
+    padding: var(--padding);
+    border-width: var(--border-width);
+    border-radius: 4px;
+    resize: vertical;
+  }
+</style>

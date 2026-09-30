@@ -21,6 +21,7 @@
     "astro-embed": "^0.14.0",
     "dedent": "^1.7.2",
     "sharp": "^0.35.4",
+    "starlight-quiz": "^1.0.2",
     "typescript": "^7.0.2",
     "vexflow": "^5.0.0",
     "workbox-window": "^7.4.1"

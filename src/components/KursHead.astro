@@ -8,6 +8,26 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
 ---
 
 <Default><slot /></Default>
+<script>
+  import * as Strudel from "@strudel/repl";
+  await Strudel.prebake();
+  declare global {
+    interface Window {
+      Pattern: any;
+    }
+    var __strudelPatched: boolean | undefined;
+  }
+  if (globalThis.__strudelPatched) {
+    console.warn("Strudel has already been patched.");
+  } else {
+    globalThis.__strudelPatched = true;
+    console.log("Patching Strudel.");
+    const origSpiral = window.Pattern.prototype.spiral;
+    window.Pattern.prototype.spiral = function (options: any) {
+      return origSpiral.call(this, { inset: 2, ...options });
+    };
+  }
+</script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="icon" href={`${basePath}favicon.svg`} type="image/svg+xml" />

@@ -2,52 +2,70 @@
 title: "Übungen 1: Einfache Beats"
 description: Übungen zum Erstellen einfacher Beats.
 ---
-import VexFlow from "../../../components/VexFlow.astro";
-import { LinkCard } from '@astrojs/starlight/components';
+import { LinkCard, LinkButton } from '@astrojs/starlight/components';
 import MiniRepl from "../../../components/MiniRepl.astro";
+import Answer from '../../../components/Answer.astro';
 import dedent from "dedent";
 
-## Kleiner Exkurs: Schlagzeug-Noten
-
-<LinkCard title="Drum Notation Guide" description="Kompakter Überblick über Schlagzeug-Noten" href="https://www.onlinedrummer.com/pages/drum-key" />
-
-## Vier Viertel Bass-Drum
+Weil Krähen nicht *so* musikalisch sind, nehmen wir vorläufig stattdessen eine Bass-Drum, in Strudel `bd`. Was passiert, wenn wir sie mehrfach in ein Muster packen?
 
 <MiniRepl
   name="44bd"
   tune={dedent`
-    $: s(\`bd bd bd bd\`)`}
+    s("bd bd bd bd")._spiral()`}
 />
 
+:::tip[Frage]{icon="comment"}
+Was passiert, wenn man einmal oder mehrfach `bd*2` oder `bd*3` verwendet?
 
-## Score 1
+<Answer name="bd_times_2"/>
+:::
 
-<VexFlow code={`(VexFlow, factory, score) => {
-    const system = factory.System();
-    const hhhh = () => score.beam(score.notes("G5/8/m, G5/8/m", { stem: "up"}));
-    const bd = () => score.notes("F4/q", /*{ stem: "down" }*/);
-    const sd = () => score.notes("C5/q", /*{ stem: "down" }*/);
-    system.addStave({
-        spaceAbove: 1,
-        voices: [
-          score.voice([hhhh(), hhhh(), hhhh(), hhhh()].flat()),
-          score.voice([bd(), sd(), bd(), sd()].flat()),
-        ],
-      })
-      .addClef("percussion")
-      .addTimeSignature("4/4");
-  }`} />
+:::tip[Frage]{icon="comment"}
+Was passiert, wenn man einmal oder mehrfach `bd!2` oder `bd!3` verwendet?
 
-## Score 2
-<VexFlow code={`(VexFlow, factory, score) => {
-    factory
-      .System()
-      .addStave({
-        voices: [
-          score.voice(score.notes("C#5/q, B4, A4, G#4", { stem: "up" })),
-          score.voice(score.notes("C#4/h, C#4", { stem: "down" })),
-        ],
-      })
-      .addClef("treble")
-      .addTimeSignature("4/4");
-}`} />
+<Answer name="bd_bang_2"/>
+:::
+
+:::tip[Frage]{icon="comment"}
+Was passiert, wenn man einmal oder mehrfach `~` verwendet? Das ist eine "Tilde", man schreibt sie mit **AltGr-+** (AltGr-Plus).
+
+<Answer name="bd_tilde"/>
+:::
+
+:::tip[Frage]{icon="comment"}
+Was passiert, wenn man einmal oder mehrfach `[bd bd]` oder `[bd bd bd]` verwendet?
+
+<Answer name="bd_brackets"/>
+:::
+
+:::tip[Frage]{icon="comment"}
+Was passiert, wenn man einmal oder mehrfach `<bd crow>` verwendet?
+
+<Answer name="bd_angles"/>
+:::
+
+:::tip[Frage]{icon="comment"}
+Was passiert, wenn man mehrere Muster mit Komma trennt, z.B. `crow, bd*4` verwendet?
+
+<Answer name="bd_comma"/>
+:::
+
+## Mehr Schlagzeug
+Die Strudel-Dokumentation hat eine gute Übersicht über die verfügbaren Klänge. Schaut sie Euch mal an!
+
+<LinkButton icon="right-arrow" href="https://strudel.cc/de/workshop/first-sounds/#drum-sounds">Strudel-Schlagzeug-Sounds</LinkButton>
+
+<MiniRepl
+  name="first_beat"
+  tune={dedent`
+    s("bd*4, sd*2, [hh!7 <hh!3 oh>]")._spiral()`}
+/>
+
+:::note
+Bei so vielen Noten ist die Spirale nicht mehr so hilfreich. Probiere mal `._pianoroll()`! Leider gibt es einen kleinen Bug 🪰, der dazu führt, dass Du die Auswertung zwei Mal starten musst, damit die Visualisierung erscheint!
+:::
+
+Um etwas Inspiration für mehr Beats zu bekommen und ein paar Herausforderungen für die Rhythmus-Programmierung zu finden, schauen wir uns als nächstes Schlagzeug-Noten an. Hier geht es weiter:
+
+<LinkButton icon='right-arrow' href="/guides/drum_notation">Schlagzeug-Noten</LinkButton>

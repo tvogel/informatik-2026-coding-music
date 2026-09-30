@@ -1,0 +1,43 @@
+---
+title: "Exkurs: Schlagzeug-Noten"
+description: Wir programmieren einfache Beats nach Noten
+---
+import VexFlow from "../../../components/VexFlow.astro";
+import { LinkCard } from "@astrojs/starlight/components";
+import MiniRepl from "../../../components/MiniRepl.astro";
+
+Der Plan wäre, als nächstes mal verschiedene Beats auszuprobieren. Dafür gibt es natürlich Noten, die zwar ähnlich aussehen, aber doch ziemlich anders zu verstehen sind als z.B. Noten für Gesang oder Melodieinstrumente. Schaut Euch das mal an:
+
+<LinkCard title="Drum Notation Guide" description="Kompakter Überblick über Schlagzeug-Noten" href="https://www.onlinedrummer.com/pages/drum-key" />
+
+
+## Everyone's First Drum Beat
+
+<VexFlow code={`(VexFlow, factory, score) => {
+    const system = factory.System();
+    const hhhh = () => score.beam(score.notes("G5/8/m, G5/m", { stem: "up"}));
+    const bd = () => score.notes("F4/q", /*{ stem: "down" }*/);
+    const bdbd = () => score.beam(score.notes("F4/8, F4", /*{ stem: "down" }*/));
+    const sd = () => score.notes("C5/q", /*{ stem: "down" }*/);
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          score.voice([hhhh(), hhhh(), hhhh(), hhhh()].flat()),
+          score.voice([bd(), sd(), bdbd(), sd()].flat()),
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+:::tip[Fragen]{icon="comment"}
+- Welche Klänge kommen in dem Beat vor?
+- Kann sich jemand den Beat schon beim Lesen vorstellen?
+- Kann jemand oder ein paar zusammen das beatboxen?
+:::
+
+Versuchen wir mal zusammen, den Beat umzusetzen!
+
+{/* <MiniRepl name='everyones_first_drum_beat' tune={`s("bd ~ [bd bd] ~, [~ sd]*2, hh*8")`}/> */}
+
+<MiniRepl name='everyones_first_drum_beat'/>

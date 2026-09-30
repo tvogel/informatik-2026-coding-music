@@ -2,161 +2,168 @@
 interface Props {
   name?: string;
   tune?: string;
+  displayOnly?: boolean;
 }
 
-const { name, tune = "" } = Astro.props;
+const { name, tune = "", displayOnly = false } = Astro.props;
 const hasDefaultTune = tune.trim().length > 0;
 ---
 
 <RootElement>
-  <div class="root not-content" data-mini-repl data-mini-repl-name={name}>
-    <div class="editor-pane">
-      <div class="controls">
-        <div class="controls__group controls__group--transport">
-          <button
-            aria-label="Start"
-            data-target="start"
-            title="Start"
-            type="button"
-          >
-            <span aria-hidden="true">►</span>
-          </button>
-          <button
-            aria-label="Stop"
-            data-target="stop"
-            title="Stop"
-            type="button"
-          >
-            <span aria-hidden="true">■</span>
-          </button>
-        </div>
-        <div class="controls__group">
-          <button
-            aria-label="Rückgängig"
-            data-target="undo"
-            title="Rückgängig"
-            type="button"
-          >
-            <span aria-hidden="true">↶</span>
-          </button>
-          <button
-            aria-label="Wiederholen"
-            data-target="redo"
-            title="Wiederholen"
-            type="button"
-          >
-            <span aria-hidden="true">↷</span>
-          </button>
-        </div>
-      </div>
-      <div data-target="strudel" data-default-tune={tune}></div>
-    </div>
-
+  <div
+    class="root not-content"
+    data-target="mini-repl"
+    data-mini-repl
+    data-default-tune={tune}
+    data-mini-repl-name={name}
+  >
     {
-      hasDefaultTune && (
-        <aside class="code-pane" aria-label="Original tune">
-          <button
-            aria-label="Diesen Original-Code wiederherstellen"
-            class="code-pane__reset"
-            data-target="reset"
-            title="Diesen Original-Code wiederherstellen"
-            type="button"
-          >
-            <span aria-hidden="true">↺</span>
-          </button>
-          <div data-target="reference" data-default-tune={tune} />
-        </aside>
+      !displayOnly && (
+        <div class="editor-pane">
+          <div class="controls">
+            <div class="controls__group controls__group--transport">
+              <button
+                aria-label="Start"
+                data-target="start"
+                title="Start"
+                type="button"
+              >
+                <span aria-hidden="true">►</span>
+              </button>
+              <button
+                aria-label="Stop"
+                data-target="stop"
+                title="Stop"
+                type="button"
+              >
+                <span aria-hidden="true">■</span>
+              </button>
+            </div>
+            <div class="controls__group">
+              <button
+                aria-label="Rückgängig"
+                data-target="undo"
+                title="Rückgängig"
+                type="button"
+              >
+                <span aria-hidden="true">↶</span>
+              </button>
+              <button
+                aria-label="Wiederholen"
+                data-target="redo"
+                title="Wiederholen"
+                type="button"
+              >
+                <span aria-hidden="true">↷</span>
+              </button>
+            </div>
+          </div>
+          <div data-target="strudel" />
+        </div>
       )
+    }
+    {
+      hasDefaultTune &&
+        ((!displayOnly && (
+          <aside class="code-pane" aria-label="Original tune">
+            <button
+              aria-label="Diesen Original-Code wiederherstellen"
+              class="code-pane__reset"
+              data-target="reset"
+              title="Diesen Original-Code wiederherstellen"
+              type="button"
+            >
+              <span aria-hidden="true">↺</span>
+            </button>
+            <div data-target="reference" data-default-tune={tune} />
+          </aside>
+        )) || <div data-target="reference" data-default-tune={tune} />)
     }
   </div>
 </RootElement>
 
 <script>
-  import "@strudel/repl";
+  import {
+    makeStorageKey,
+    readLocalStorage,
+    writeLocalStorage,
+  } from "../lib/localStorage";
 
-  RootElement.ready(($) => {
-    const strudel = $("strudel");
+  RootElement.ready(async ($) => {
+    const root = $("mini-repl");
+    const strudel = $.optional("strudel");
     const reference = $.optional("reference");
-    if (!strudel) return;
 
-    const defaultTune = strudel.dataset.defaultTune ?? "";
-    const root = strudel.closest("[data-mini-repl]");
-    const replName = root?.getAttribute("data-mini-repl-name")?.trim() ?? "";
-    const replNodes = Array.from(document.querySelectorAll("[data-mini-repl]"));
-    const replIndex = root ? replNodes.indexOf(root) : -1;
-    const storageKeySuffix = replName || String(replIndex);
-    const storageKey = `mini-repl:${window.location.pathname}:${storageKeySuffix}`;
+    const defaultTune = root.dataset.defaultTune ?? "";
+    const storageKey = makeStorageKey(
+      "mini-repl",
+      root,
+      "[data-mini-repl]",
+      root?.dataset.miniReplName,
+    );
 
-    const readStoredTune = () => {
-      try {
-        return window.localStorage.getItem(storageKey);
-      } catch {
-        return null;
-      }
-    };
+    const initialTune =
+      readLocalStorage(storageKey) ?? root.dataset.tune ?? defaultTune;
+    root.dataset.tune = initialTune;
 
-    const writeStoredTune = (code: string) => {
-      try {
-        window.localStorage.setItem(storageKey, code);
-      } catch {
-        // Ignore storage failures such as private mode restrictions.
-      }
-    };
+    let repl:
+      | (HTMLElement & {
+          editor?: {
+            editor?: {
+              contentDOM?: HTMLElement;
+              focus?: () => void;
+            };
+            evaluate: () => void;
+            stop: () => void;
+          };
+        })
+      | undefined;
+    if (strudel) {
+      repl = document.createElement("strudel-editor");
 
-    const initialTune = readStoredTune() ?? strudel.dataset.tune ?? defaultTune;
-    strudel.dataset.tune = initialTune;
+      repl.setAttribute("code", initialTune);
+      strudel.append(repl);
 
-    const repl = document.createElement("strudel-editor") as HTMLElement & {
-      editor?: {
-        editor?: {
-          contentDOM?: HTMLElement;
-          focus?: () => void;
-        };
-        evaluate: () => void;
-        stop: () => void;
+      repl.addEventListener("update", ((event: Event) => {
+        const detail = (event as CustomEvent<{ code?: string }>).detail;
+        const code = detail.code ?? "";
+        strudel.dataset.tune = code;
+        writeLocalStorage(storageKey, code);
+      }) as EventListener);
+
+      const triggerHistoryAction = (
+        inputType: "historyUndo" | "historyRedo",
+      ) => {
+        const view = repl!.editor?.editor;
+        const target = view?.contentDOM;
+        if (!target) return;
+
+        view?.focus?.();
+        target.dispatchEvent(
+          new InputEvent("beforeinput", {
+            bubbles: true,
+            cancelable: true,
+            inputType,
+          }),
+        );
       };
-    };
 
-    repl.setAttribute("code", initialTune);
-    strudel.append(repl);
+      $("start").addEventListener("click", () => {
+        repl!.editor?.evaluate();
+      });
 
-    repl.addEventListener("update", ((event: Event) => {
-      const detail = (event as CustomEvent<{ code?: string }>).detail;
-      const code = detail.code ?? "";
-      strudel.dataset.tune = code;
-      writeStoredTune(code);
-    }) as EventListener);
+      $("stop").addEventListener("click", () => {
+        repl!.editor?.stop();
+      });
 
-    const triggerHistoryAction = (inputType: "historyUndo" | "historyRedo") => {
-      const view = repl.editor?.editor;
-      const target = view?.contentDOM;
-      if (!target) return;
+      $("undo").addEventListener("click", () => {
+        triggerHistoryAction("historyUndo");
+      });
 
-      view?.focus?.();
-      target.dispatchEvent(
-        new InputEvent("beforeinput", {
-          bubbles: true,
-          cancelable: true,
-          inputType,
-        }),
-      );
-    };
-
-    $("start").addEventListener("click", () => {
-      repl.editor?.evaluate();
-    });
-
-    $("stop").addEventListener("click", () => {
-      repl.editor?.stop();
-    });
-
-    $("undo").addEventListener("click", () => {
-      triggerHistoryAction("historyUndo");
-    });
-
-    $("redo").addEventListener("click", () => {
-      triggerHistoryAction("historyRedo");
-    });
+      $("redo").addEventListener("click", () => {
+        triggerHistoryAction("historyRedo");
+      });
+    }
 
     if (reference) {
       const referenceRepl = document.createElement(
@@ -188,12 +195,14 @@ const hasDefaultTune = tune.trim().length > 0;
       );
       queueMicrotask(lockReferenceEditor);
 
-      const reset = $("reset");
-      reset.addEventListener("click", () => {
-        strudel.dataset.tune = defaultTune;
-        writeStoredTune(defaultTune);
-        repl.setAttribute("code", defaultTune);
-      });
+      if (strudel) {
+        const reset = $("reset");
+        reset.addEventListener("click", () => {
+          strudel.dataset.tune = defaultTune;
+          writeLocalStorage(storageKey, defaultTune);
+          repl!.setAttribute("code", defaultTune);
+        });
+      }
     }
   });
 </script>

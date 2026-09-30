@@ -2,9 +2,10 @@
 title: Strudel
 ---
 import MiniRepl from "../../../components/MiniRepl.astro";
+import { LinkButton } from '@astrojs/starlight/components';
 
-- ist eine deklarative Sprache: Was ist das "Problem"? \
-  (Kontrast imperative Sprache: Was ist zu tun?)
+- ist eine deklarative Sprache: beschreibt das zu lösende Problem, \
+  Kontrast imperative Sprache: beschreibt, was zu tun ist, um ein Problem zu lösen
 - ist selbst in JavaScript geschrieben (imperativ)
 - basiert auf [*Tidal Cycles*](https://tidalcycles.org/), geschrieben in Haskell (deklarativ)
 - begründet von Alex McLean (2022) unter intensiver Mitarbeit von Felix Roos
@@ -38,4 +39,10 @@ Strudel arbeitet mit sich wiederholenden *Zyklen*, für die die Eingabe jeweils 
 Wie viele Schläge pro Minute (beats per minute, BPM) sind das bei einem 4/4-Takt (Vier-Viertel-Takt)?
 :::
 
+In Strudel kann man sich diese Zyklen visuell darstellen lassen:
 
+<MiniRepl name="first-crow-visual" tune={`s("crow")._spiral()`}/>
+
+Damit sind wir gewappnet für die ersten Übungen!
+
+<LinkButton iconPlacement="start" icon="right-arrow" href="/exercises/01_basic_beats">Übungen: Einfache Beats</LinkButton>
