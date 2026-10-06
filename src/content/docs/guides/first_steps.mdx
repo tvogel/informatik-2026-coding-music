@@ -4,12 +4,48 @@ title: Strudel
 import MiniRepl from "../../../components/MiniRepl.astro";
 import { LinkButton } from '@astrojs/starlight/components';
 
-- ist eine deklarative Sprache: beschreibt das zu lösende Problem, \
-  Kontrast imperative Sprache: beschreibt, was zu tun ist, um ein Problem zu lösen
+- ist eine deklarative Sprache: beschreibt das zu lösende Problem, bzw. wie das Stück aufgebaut ist, das gespielt werden soll
+- das Gegenstück zu einer deklarativen Sprache ist eine imperative Sprache, die beschreibt, was Schritt für Schritt zu tun ist, um ein Problem zu lösen
 - ist selbst in JavaScript geschrieben (imperativ)
 - basiert auf [*Tidal Cycles*](https://tidalcycles.org/), geschrieben in Haskell (deklarativ)
 - begründet von Alex McLean (2022) unter intensiver Mitarbeit von Felix Roos
 - wird von der Community weiterentwickelt mit großen Beiträgen von Switch Angel (Jade Rose Rowland) und dem Aria-Projekt
+
+### Exkurs: Deklarative und imperative Beschreibung einer Aufgabe
+
+Aufgabe: **Verdoppele alle Zahlen in einer Liste**
+
+In einer *imperativen* Sprache könnte das so aussehen:
+```js
+var zahlen = [1,2,3,4,5]
+var verdoppelt = []
+
+for (var i = 0; i < zahlen.length; i++) {
+  var neueZahl = zahlen[i] * 2
+  verdoppelt.push(neueZahl)
+}
+console.log(verdoppelt) //ausgegeben wird: [2,4,6,8,10]
+```
+(Beispiel in JavaScript)
+
+Merkmale: Es wird ganz genau beschrieben, was in welcher Reihenfolge gemacht wird, wie die Daten eingelesen und wie sie ausgegeben werden.
+
+Solche ganz ausführlichen Befehle habt Ihr vielleicht schon bei Robot Karol in der 9. Klasse kennengelernt.
+
+In einer *deklarativen* Sprache könnte das so aussehen:
+```js
+var zahlen = [1,2,3,4,5]
+var verdoppelt = zahlen.map(x => 2*x)
+console.log(verdoppelt) //ausgegeben wird wieder: [2,4,6,8,10]
+```
+(Beispiel auch in JavaScript, aber deklarativ formuliert)
+
+Merkmale: Man gibt nur an, dass man alle Zahlen verdoppelt haben will, in welcher Reihenfolge und wie der Vorgang genau abläuft ist nicht gesagt.
+
+Vorteile der deklarativen Formulierung:
+- kürzer
+- leichter lesbar
+- kann im Prinzip schneller ausgeführt werden, z.B. wenn der Computer mehrere Prozessoren hat, kann er die Liste (wenn sie länger wäre) in mehrere Teile teilen und gleichzeitig abarbeiten
 
 ## Der Strudel-REPL
 

@@ -1,0 +1,739 @@
+---
+title: "Übungen 2: Beats nach Noten"
+description: Übungen zum Übertragen von Schlagzeug-Noten in Strudel-Patterns
+---
+import VexFlow from "../../../components/VexFlow.astro";
+import { LinkCard, LinkButton } from '@astrojs/starlight/components';
+import MiniRepl from "../../../components/MiniRepl.astro";
+import Answer from '../../../components/Answer.astro';
+import dedent from "dedent";
+
+## 4 On The Floor
+
+<VexFlow code={`(VexFlow, factory, score) => {
+    const system = factory.System();
+    const hhhh = () => score.beam(score.notes("G5/8/m, G5/m", { stem: "up"}));
+    const bd = () => score.notes("F4/q", { stem: "down" });
+    const bdsd = () => score.notes("(F4 C5)/q", { stem: "down" });
+    const sd = () => score.notes("C5/q", /*{ stem: "down" }*/);
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          score.voice([hhhh(), hhhh(), hhhh(), hhhh()].flat()),
+          score.voice([bd(), bdsd(), bd(), bdsd()].flat()),
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+<MiniRepl name='4_on_the_floor'/>
+
+## 4 On The Floor (Halftime)
+
+<VexFlow code={`(VexFlow, f, score) => {
+    const system = f.System();
+    const bd = 'f/4',
+      sd = 'c/5', cs = 'c/5/x2',
+      hh = 'g/5/x2',
+      sp = 'f/5/x2',
+      lt = 'a/4', ht = 'e/5',
+      rb = 'f/5/d2', rd = 'f/5/x2';
+    const voice0 = f
+      .Voice()
+      .addTickables([
+        f.StaveNote({ keys: [bd, hh], duration: '4'}).addModifier(f.Articulation({ type: 'ah' }), 0),
+        f.StaveNote({ keys: [bd, hh], duration: '4'}).addModifier(f.Articulation({ type: 'ah' }), 0),
+        f.StaveNote({ keys: [bd, sd, hh], duration: '4'}).addModifier(f.Articulation({ type: 'ah' }), 0),
+        f.StaveNote({ keys: [bd, hh], duration: '4'}).addModifier(f.Articulation({ type: 'ah' }), 0),
+      ]);
+
+    console.log({voice0})
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          voice0
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+<MiniRepl name='4_on_the_floor_halftime'/>
+
+## Dance Beat
+
+<VexFlow code={`(VexFlow, f, score) => {
+    const system = f.System();
+    const voice0 = f
+      .Voice()
+      .addTickables([
+        f.StaveNote({ keys: ['f/4'], duration: '8' }),
+        f.StaveNote({ keys: ['g/5/x2'], duration: '8' }),
+        f.StaveNote({ keys: ['f/4', 'c/5'], duration: '8' }),
+        f.StaveNote({ keys: ['g/5/x2'], duration: '8' }),
+        f.StaveNote({ keys: ['f/4'], duration: '8' }),
+        f.StaveNote({ keys: ['g/5/x2'], duration: '8' }),
+        f.StaveNote({ keys: ['f/4', 'c/5'], duration: '8' }),
+        f.StaveNote({ keys: ['g/5/x2'], duration: '8' }),
+      ]);
+    for (let i = 1; i < voice0.getTickables().length; i += 2)
+      f.Beam({ notes: voice0.getTickables().slice(i-1, i+1) /* as StemmableNote[] */ });
+    console.log({voice0})
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          voice0
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+
+<MiniRepl name='dance_beat'/>
+
+## Everyone's Second Drum Beat
+
+<VexFlow code={`(VexFlow, f, score) => {
+    const system = f.System();
+    const bd = 'f/4'; const sd = 'c/5'; const hh = 'g/5/x2';
+    const voice0 = f
+      .Voice()
+      .addTickables([
+        f.StaveNote({ keys: [bd, hh], duration: '8' }),
+        f.StaveNote({ keys: [bd, hh], duration: '8' }),
+        f.StaveNote({ keys: [sd, hh], duration: '8' }),
+        f.StaveNote({ keys: [hh], duration: '8' }),
+        f.StaveNote({ keys: [bd, hh], duration: '8' }),
+        f.StaveNote({ keys: [bd, hh], duration: '8' }),
+        f.StaveNote({ keys: [sd, hh], duration: '8' }),
+        f.StaveNote({ keys: [hh], duration: '8' }),
+      ]);
+    for (let i = 1; i < voice0.getTickables().length; i += 2)
+      f.Beam({ notes: voice0.getTickables().slice(i-1, i+1) });
+    console.log({voice0})
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          voice0
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+<MiniRepl name='everyones_second_drum_beat'/>
+
+## Classic Rock Beat
+
+<VexFlow code={`(VexFlow, f, score) => {
+    const system = f.System();
+    const bd = 'f/4'; const sd = 'c/5'; const hh = 'g/5/x2';
+    const voice0 = f
+      .Voice()
+      .addTickables([
+        f.StaveNote({ keys: [bd, hh], duration: '8' }),
+        f.StaveNote({ keys: [bd, hh], duration: '8' }),
+        f.StaveNote({ keys: [sd, hh], duration: '8' }),
+        f.StaveNote({ keys: [bd, hh], duration: '8' }),
+        f.StaveNote({ keys: [bd, hh], duration: '8' }),
+        f.StaveNote({ keys: [bd, hh], duration: '8' }),
+        f.StaveNote({ keys: [sd, hh], duration: '8' }),
+        f.StaveNote({ keys: [bd, hh], duration: '8' }),
+      ]);
+    for (let i = 1; i < voice0.getTickables().length; i += 2)
+      f.Beam({ notes: voice0.getTickables().slice(i-1, i+1) });
+    console.log({voice0})
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          voice0
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+<MiniRepl name='classic_rock'/>
+
+## Classic Rock Beat 2
+
+<VexFlow code={`(VexFlow, f, score) => {
+    const system = f.System();
+    const bd = 'f/4'; const sd = 'c/5'; const hh = 'g/5/x2';
+    const voice0 = f
+      .Voice()
+      .addTickables([
+        f.StaveNote({ keys: [sd, hh], duration: '8' }),
+        f.StaveNote({ keys: [hh], duration: '8' }),
+        f.StaveNote({ keys: [sd, hh], duration: '8' }),
+        f.StaveNote({ keys: [hh], duration: '8' }),
+        f.StaveNote({ keys: [sd, hh], duration: '8' }),
+        f.StaveNote({ keys: [bd, hh], duration: '8' }),
+        f.StaveNote({ keys: [sd, hh], duration: '8' }),
+        f.StaveNote({ keys: [bd, hh], duration: '8' }),
+      ]);
+    for (let i = 1; i < voice0.getTickables().length; i += 2)
+      f.Beam({ notes: voice0.getTickables().slice(i-1, i+1) });
+    console.log({voice0})
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          voice0
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+<MiniRepl name='classic_rock_2'/>
+
+
+## Classic Halftime Beat
+
+<VexFlow code={`(VexFlow, f, score) => {
+    const system = f.System();
+    const bd = 'f/4', sd = 'c/5', hh = 'g/5/x2', sp = 'f/5/x2';
+    const voice0 = f
+      .Voice()
+      .addTickables([
+        f.StaveNote({ keys: [bd, sp], duration: '8d'}),
+        f.StaveNote({ keys: [bd], duration: '16' }),
+        f.StaveNote({ keys: [sp], duration: '8', }),
+        f.StaveNote({ keys: [bd], duration: '8' }),
+        f.StaveNote({ keys: [sp, sd], duration: '4', }),
+        f.StaveNote({ keys: [sp], duration: '4', }),
+      ]);
+    VexFlow.Dot.buildAndAttach(voice0.getTickables().slice(0, 1), { all: true });
+    f.Beam({ notes: voice0.getTickables().slice(0, 2) });
+    f.Beam({ notes: voice0.getTickables().slice(2, 4) });
+
+    console.log({voice0})
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          voice0
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+<MiniRepl name='classic_halftime'/>
+
+## Classic Halftime Beat With 16th
+
+<VexFlow code={`(VexFlow, f, score) => {
+    const system = f.System();
+    const bd = 'f/4', sd = 'c/5', hh = 'g/5/x2', sp = 'f/5/x2';
+    const voice0 = f
+      .Voice()
+      .addTickables([
+        f.StaveNote({ keys: [bd, hh], duration: '16'}),
+        f.StaveNote({ keys: [hh], duration: '16'}),
+        f.StaveNote({ keys: [hh], duration: '16'}),
+        f.StaveNote({ keys: [bd, hh], duration: '16'}),
+        f.StaveNote({ keys: [hh], duration: '16'}),
+        f.StaveNote({ keys: [hh], duration: '16'}),
+        f.StaveNote({ keys: [bd, hh], duration: '16'}),
+        f.StaveNote({ keys: [hh], duration: '16'}),
+        f.StaveNote({ keys: [sd, hh], duration: '16'}),
+        f.StaveNote({ keys: [hh], duration: '16'}),
+        f.StaveNote({ keys: [hh], duration: '16'}),
+        f.StaveNote({ keys: [hh], duration: '16'}),
+        f.StaveNote({ keys: [hh], duration: '16'}),
+        f.StaveNote({ keys: [hh], duration: '16'}),
+        f.StaveNote({ keys: [hh], duration: '16'}),
+        f.StaveNote({ keys: [hh], duration: '16'}),
+      ]);
+    for (let i = 3; i < voice0.getTickables().length; i += 4)
+      f.Beam({ notes: voice0.getTickables().slice(i-3, i+1) });
+
+    console.log({voice0})
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          voice0
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+<MiniRepl name='classic_halftime_16th'/>
+
+## Classic Halftime (Turned Normal)
+
+<VexFlow code={`(VexFlow, f, score) => {
+    const system = f.System();
+    const bd = 'f/4', sd = 'c/5', hh = 'g/5/x2', sp = 'f/5/x2';
+    const voice0 = f
+      .Voice()
+      .addTickables([
+        f.StaveNote({ keys: [bd, hh], duration: '8'}),
+        f.StaveNote({ keys: [hh], duration: '16'}),
+        f.StaveNote({ keys: [bd], duration: '16'}),
+        f.StaveNote({ keys: [sd, hh], duration: '8'}),
+        f.StaveNote({ keys: [bd, hh], duration: '8'}),
+        f.StaveNote({ keys: [hh], duration: '8'}),
+        f.StaveNote({ keys: [hh], duration: '8'}),
+        f.StaveNote({ keys: [sd, hh], duration: '8'}),
+        f.StaveNote({ keys: [hh], duration: '8'}),
+      ]);
+    f.Beam({ notes: voice0.getTickables().slice(0, 3) });
+    f.Beam({ notes: voice0.getTickables().slice(3, 5) });
+    f.Beam({ notes: voice0.getTickables().slice(5, 7) });
+    f.Beam({ notes: voice0.getTickables().slice(7, 9) });
+
+    console.log({voice0})
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          voice0
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+<MiniRepl name='classic_halftime_turned_normal'/>
+
+## "I'm Gonna Change Things Up" Beat
+
+<VexFlow code={`(VexFlow, f, score) => {
+    const system = f.System();
+    const bd = 'f/4', sd = 'c/5', hh = 'g/5/x2', sp = 'f/5/x2';
+    const voice0 = f
+      .Voice()
+      .addTickables([
+        f.StaveNote({ keys: [sd, sp], duration: '8'}),
+        f.StaveNote({ keys: [bd], duration: '8'}),
+        f.StaveNote({ keys: [bd, sp], duration: '8'}),
+        f.StaveNote({ keys: [sd], duration: '8'}),
+        f.StaveNote({ keys: [bd, sp], duration: '8'}),
+        f.StaveNote({ keys: [bd], duration: '8'}),
+        f.StaveNote({ keys: [sd, sp], duration: '8'}),
+        f.StaveNote({ keys: [bd], duration: '8'}),
+      ]);
+    f.Beam({ notes: voice0.getTickables().slice(0, 2) });
+    f.Beam({ notes: voice0.getTickables().slice(2, 4) });
+    f.Beam({ notes: voice0.getTickables().slice(4, 6) });
+    f.Beam({ notes: voice0.getTickables().slice(6, 8) });
+
+    console.log({voice0})
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          voice0
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+<MiniRepl name='im_gonna_change_things_up'/>
+
+## The Bieber Beat
+
+<VexFlow code={`(VexFlow, f, score) => {
+    const system = f.System();
+    const bd = 'f/4', sd = 'c/5', hh = 'g/5/x2', sp = 'f/5/x2';
+    const voice0 = f
+      .Voice()
+      .addTickables([
+        f.StaveNote({ keys: [bd, hh], duration: '8'}),
+        f.StaveNote({ keys: [bd, hh], duration: '8'}),
+        f.StaveNote({ keys: [sd, hh], duration: '8'}),
+        f.StaveNote({ keys: [hh], duration: '16'}),
+        f.StaveNote({ keys: [sd], duration: '16'}),
+        f.StaveNote({ keys: [hh], duration: '16'}),
+        f.StaveNote({ keys: [sd], duration: '16'}),
+        f.StaveNote({ keys: [bd, hh], duration: '8'}),
+        f.StaveNote({ keys: [sd, hh], duration: '8'}),
+        f.StaveNote({ keys: [hh], duration: '8'}),
+      ]);
+    VexFlow.Parenthesis.buildAndAttach(voice0.getTickables().slice(4, 5));
+    VexFlow.Parenthesis.buildAndAttach(voice0.getTickables().slice(6, 7));
+    f.Beam({ notes: voice0.getTickables().slice(0, 2) });
+    f.Beam({ notes: voice0.getTickables().slice(2, 5) });
+    f.Beam({ notes: voice0.getTickables().slice(5, 8) });
+    f.Beam({ notes: voice0.getTickables().slice(8, 10) });
+
+    console.log({voice0})
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          voice0
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+:::tip
+"Ghost notes" sind leicht/leise geschlagene Töne (meist Snare Drum). Probiere den Befehl
+```js
+.gain("1 [1 [1 0.1]] [[1 0.1] 1] 1")
+```
+an Dein Drum-Pattern anzuhängen, also so:
+```js
+s("....").gain("...")
+```
+:::
+
+<MiniRepl name='bieber'/>
+
+## The Bieber Beat On Toms
+
+<VexFlow code={`(VexFlow, f, score) => {
+    const system = f.System();
+    const bd = 'f/4', sd = 'c/5', hh = 'g/5/x2', sp = 'f/5/x2', lt = 'a/4', ht = 'e/5';
+    const voice0 = f
+      .Voice()
+      .addTickables([
+        f.StaveNote({ keys: [bd, lt], duration: '8'}),
+        f.StaveNote({ keys: [bd, lt], duration: '8'}),
+        f.StaveNote({ keys: [sd, lt], duration: '8'}),
+        f.StaveNote({ keys: [lt], duration: '16'}),
+        f.StaveNote({ keys: [ht], duration: '16'}),
+        f.StaveNote({ keys: [lt], duration: '16'}),
+        f.StaveNote({ keys: [ht], duration: '16'}),
+        f.StaveNote({ keys: [bd, lt], duration: '8'}),
+        f.StaveNote({ keys: [sd, lt], duration: '8'}),
+        f.StaveNote({ keys: [lt], duration: '8'}),
+      ]);
+    f.Beam({ notes: voice0.getTickables().slice(0, 2) });
+    f.Beam({ notes: voice0.getTickables().slice(2, 5) });
+    f.Beam({ notes: voice0.getTickables().slice(5, 8) });
+    f.Beam({ notes: voice0.getTickables().slice(8, 10) });
+
+    console.log({voice0})
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          voice0
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+<MiniRepl name='bieber_on_toms'/>
+
+## Pop Country Beat
+
+<VexFlow code={`(VexFlow, f, score) => {
+    const system = f.System();
+    const bd = 'f/4', sd = 'c/5', hh = 'g/5/x2', sp = 'f/5/x2', lt = 'a/4', ht = 'e/5';
+    const voice0 = f
+      .Voice()
+      .addTickables([
+        f.StaveNote({ keys: [bd, hh], duration: '8'}),
+        f.StaveNote({ keys: [hh], duration: '8'}),
+        f.StaveNote({ keys: [sd, hh], duration: '8'}),
+        f.StaveNote({ keys: [hh], duration: '8'}),
+        f.StaveNote({ keys: [hh], duration: '8'}),
+        f.StaveNote({ keys: [bd, hh], duration: '8'}),
+        f.StaveNote({ keys: [sd, hh], duration: '8'}),
+        f.StaveNote({ keys: [hh], duration: '8'}),
+      ]);
+    f.Beam({ notes: voice0.getTickables().slice(0, 2) });
+    f.Beam({ notes: voice0.getTickables().slice(2, 4) });
+    f.Beam({ notes: voice0.getTickables().slice(4, 6) });
+    f.Beam({ notes: voice0.getTickables().slice(6, 8) });
+
+    console.log({voice0})
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          voice0
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+<MiniRepl name='pop_country'/>
+
+## Pop Country Chorus Beat
+
+<VexFlow code={`(VexFlow, f, score) => {
+    const system = f.System();
+    const bd = 'f/4', sd = 'c/5', hh = 'g/5/x2', sp = 'f/5/x2',
+      lt = 'a/4', ht = 'e/5',
+      rb = 'f/5/d2', rd = 'f/5/x2';
+    const voice0 = f
+      .Voice()
+      .addTickables([
+        f.StaveNote({ keys: [bd, rb], duration: '8'}),
+        f.StaveNote({ keys: [rd], duration: '8'}),
+        f.StaveNote({ keys: [sd, rb], duration: '8'}),
+        f.StaveNote({ keys: [rd], duration: '8'}),
+        f.StaveNote({ keys: [rb], duration: '8'}),
+        f.StaveNote({ keys: [bd, rd], duration: '8'}),
+        f.StaveNote({ keys: [sd, rb], duration: '8'}),
+        f.StaveNote({ keys: [rd], duration: '8'}),
+      ]);
+    f.Beam({ notes: voice0.getTickables().slice(0, 2) });
+    f.Beam({ notes: voice0.getTickables().slice(2, 4) });
+    f.Beam({ notes: voice0.getTickables().slice(4, 6) });
+    f.Beam({ notes: voice0.getTickables().slice(6, 8) });
+
+    console.log({voice0})
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          voice0
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+:::tip
+Strudel hat zwar eine "Ride", aber keine "Ride Bell". Für die Ride Bell schlägt
+man das Ride-Becken an dem gewölbten Teil in der Mitte an.
+
+Wir können aber zusätzliche Töne aus dem Internet laden. Probier mal folgendes
+vor Deinen Rhythmus zu schreiben:
+```js
+samples({
+  rb: 'GSCW Drums Kit 2 Samples/V01-Rbell-22.wav',
+  rd: 'GSCW Drums Kit 2 Samples/V01-Ride-22.wav',
+}, 'https://raw.githubusercontent.com/gregharvey/drum-samples/master/');
+```
+Damit bekommst Du eine passende Ride und Ride Bell!
+:::
+
+<MiniRepl name='pop_country_chorus'/>
+
+## Double Time Beat
+
+<VexFlow code={`(VexFlow, f, score) => {
+    const system = f.System();
+    const bd = 'f/4', sd = 'c/5', hh = 'g/5/x2', sp = 'f/5/x2',
+      lt = 'a/4', ht = 'e/5',
+      rb = 'f/5/d2', rd = 'f/5/x2';
+    const voice0 = f
+      .Voice()
+      .addTickables([
+        f.StaveNote({ keys: [bd, hh], duration: '8'}),
+        f.StaveNote({ keys: [sd, hh], duration: '8'}),
+        f.StaveNote({ keys: [bd, hh], duration: '16'}),
+        f.StaveNote({ keys: [bd], duration: '16'}),
+        f.StaveNote({ keys: [sd, hh], duration: '8'}),
+        f.StaveNote({ keys: [bd, hh], duration: '8'}),
+        f.StaveNote({ keys: [sd, hh], duration: '8'}),
+        f.StaveNote({ keys: [bd, hh], duration: '16'}),
+        f.StaveNote({ keys: [bd], duration: '16'}),
+        f.StaveNote({ keys: [sd, hh], duration: '8'}),
+      ]);
+    f.Beam({ notes: voice0.getTickables().slice(0, 2) });
+    f.Beam({ notes: voice0.getTickables().slice(2, 5) });
+    f.Beam({ notes: voice0.getTickables().slice(5, 7) });
+    f.Beam({ notes: voice0.getTickables().slice(7, 10) });
+
+    console.log({voice0})
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          voice0
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+<MiniRepl name='double_time'/>
+
+## The Jungle Beat
+
+<VexFlow code={`(VexFlow, f, score) => {
+    const system = f.System();
+    const bd = 'f/4', sd = 'c/5', hh = 'g/5/x2', sp = 'f/5/x2',
+      lt = 'a/4', ht = 'e/5',
+      rb = 'f/5/d2', rd = 'f/5/x2';
+    const voice0 = f
+      .Voice()
+      .addTickables([
+        f.StaveNote({ keys: [bd, lt], duration: '8d'}),
+        f.StaveNote({ keys: [ht], duration: '16'}),
+        f.StaveNote({ keys: [bd, lt], duration: '8'}),
+        f.StaveNote({ keys: [ht], duration: '8'}),
+        f.StaveNote({ keys: [bd, lt], duration: '16'}),
+        f.StaveNote({ keys: [ht], duration: '8d'}),
+        f.StaveNote({ keys: [bd, lt, ht], duration: '4'}),
+      ]);
+    VexFlow.Dot.buildAndAttach([0, 5].map(i => voice0.getTickables()[i]));
+    f.Beam({ notes: voice0.getTickables().slice(0, 2) });
+    f.Beam({ notes: voice0.getTickables().slice(2, 4) });
+    f.Beam({ notes: voice0.getTickables().slice(4, 6) });
+
+    console.log({voice0})
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          voice0
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+<MiniRepl name='jungle'/>
+
+## The Cross Stick Beat
+
+<VexFlow code={`(VexFlow, f, score) => {
+    const system = f.System();
+    const bd = 'f/4',
+      sd = 'c/5', cs = 'c/5/x2',
+      hh = 'g/5/x2', sp = 'f/5/x2',
+      lt = 'a/4', ht = 'e/5',
+      rb = 'f/5/d2', rd = 'f/5/x2';
+    const voice0 = f
+      .Voice()
+      .addTickables([
+        f.StaveNote({ keys: [bd, hh], duration: '8'}),
+        f.StaveNote({ keys: [hh], duration: '8'}),
+        f.StaveNote({ keys: [bd, hh], duration: '8'}),
+        f.StaveNote({ keys: [hh], duration: '8'}),
+        f.StaveNote({ keys: [cs, hh], duration: '8'}),
+        f.StaveNote({ keys: [hh], duration: '16'}),
+        f.StaveNote({ keys: [cs], duration: '16'}),
+        f.StaveNote({ keys: [hh], duration: '8'}),
+        f.StaveNote({ keys: [hh], duration: '8'}),
+      ]);
+    f.Beam({ notes: voice0.getTickables().slice(0, 2) });
+    f.Beam({ notes: voice0.getTickables().slice(2, 4) });
+    f.Beam({ notes: voice0.getTickables().slice(4, 7) });
+    f.Beam({ notes: voice0.getTickables().slice(7, 9) });
+
+    console.log({voice0})
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          voice0
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+:::tip
+Das "X" in der Snare-Drum-Zeile ist ein "Cross-Stick".
+Hier bekommst Du einen Cross-Stick-Sound:
+```js
+samples({
+  cs: 'GSCW Drums Kit 2 Samples/V03-SStick.wav',
+}, 'https://raw.githubusercontent.com/gregharvey/drum-samples/master/');
+s("cs")
+```
+:::
+
+<MiniRepl name='cross_stick'/>
+
+## Your First Ghost Note Beat
+
+<VexFlow width={800} code={`(VexFlow, f, score) => {
+    const system = f.System();
+    const bd = 'f/4',
+      sd = 'c/5', cs = 'c/5/x2',
+      hh = 'g/5/x2', sp = 'f/5/x2',
+      lt = 'a/4', ht = 'e/5',
+      rb = 'f/5/d2', rd = 'f/5/x2';
+    const voice0 = f
+      .Voice()
+      .addTickables([
+        f.StaveNote({ keys: [bd, hh], duration: '16'}),
+        f.StaveNote({ keys: [sd], duration: '16'}),
+        f.StaveNote({ keys: [hh], duration: '16'}),
+        f.StaveNote({ keys: [sd], duration: '16'}),
+        f.StaveNote({ keys: [sd], duration: '16'}),
+        f.StaveNote({ keys: [sd], duration: '16'}),
+        f.StaveNote({ keys: [bd, hh], duration: '16'}),
+        f.StaveNote({ keys: [sd], duration: '16'}),
+        f.StaveNote({ keys: [hh], duration: '16'}),
+        f.StaveNote({ keys: [sd], duration: '16'}),
+        f.StaveNote({ keys: [bd, hh], duration: '16'}),
+        f.StaveNote({ keys: [sd], duration: '16'}),
+        f.StaveNote({ keys: [sd], duration: '16'}),
+        f.StaveNote({ keys: [sd], duration: '16'}),
+        f.StaveNote({ keys: [hh], duration: '16'}),
+        f.StaveNote({ keys: [sd], duration: '16'}),
+      ]);
+    VexFlow.Parenthesis.buildAndAttach([0,1,2,3,4,5,6,7].map(x => x*2 + 1).map(i => voice0.getTickables()[i]));
+    f.Beam({ notes: voice0.getTickables().slice(0, 4) });
+    f.Beam({ notes: voice0.getTickables().slice(4, 8) });
+    f.Beam({ notes: voice0.getTickables().slice(8, 12) });
+    f.Beam({ notes: voice0.getTickables().slice(12, 16) });
+
+    console.log({voice0})
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          voice0
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+
+<MiniRepl name='your_first_ghost_note_beat'/>
+
+## Anthem Tom Beat
+
+<VexFlow width={800} code={`(VexFlow, f, score) => {
+    const system = f.System();
+    const bd = 'f/4',
+      sd = 'c/5', cs = 'c/5/x2',
+      hh = 'g/5/x2', sp = 'f/5/x2',
+      lt = 'a/4', ht = 'e/5',
+      rb = 'f/5/d2', rd = 'f/5/x2';
+    const voice0 = f
+      .Voice()
+      .addTickables([
+        f.StaveNote({ keys: [lt, ht], duration: '16'}),
+        f.StaveNote({ keys: [bd], duration: '16'}),
+        f.StaveNote({ keys: [lt, ht], duration: '16'}),
+        f.StaveNote({ keys: [bd], duration: '16'}),
+
+        f.StaveNote({ keys: [sd], duration: '16'}),
+        f.StaveNote({ keys: [bd], duration: '16'}),
+        f.StaveNote({ keys: [bd], duration: '16'}),
+        f.StaveNote({ keys: [ht, lt], duration: '16'}),
+
+        f.StaveNote({ keys: [bd], duration: '16'}),
+        f.StaveNote({ keys: [ht], duration: '16'}),
+        f.StaveNote({ keys: [lt], duration: '16'}),
+        f.StaveNote({ keys: [bd], duration: '16'}),
+
+        f.StaveNote({ keys: [sd], duration: '16'}),
+        f.StaveNote({ keys: [bd], duration: '8d'}),
+      ]);
+    VexFlow.Dot.buildAndAttach(voice0.getTickables().slice(13, 14));
+    f.Beam({ notes: voice0.getTickables().slice(0, 4) });
+    f.Beam({ notes: voice0.getTickables().slice(4, 8) });
+    f.Beam({ notes: voice0.getTickables().slice(8, 12) });
+    f.Beam({ notes: voice0.getTickables().slice(12, 14) });
+
+    console.log({voice0})
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          voice0
+        ],
+      })
+      .addClef("percussion")
+      .addTimeSignature("4/4");
+  }`} />
+
+
+<MiniRepl name='anthem_tom_beat'/>
+
+## Allerhand, 20 Beats gelernt! Herzlichen Glückwunsch!
+
+
+{/* <LinkButton icon='right-arrow' href="../../guides/drum_notation/">Schlagzeug-Noten</LinkButton> */}

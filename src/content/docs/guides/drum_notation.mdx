@@ -3,7 +3,7 @@ title: "Exkurs: Schlagzeug-Noten"
 description: Wir programmieren einfache Beats nach Noten
 ---
 import VexFlow from "../../../components/VexFlow.astro";
-import { LinkCard } from "@astrojs/starlight/components";
+import { LinkCard, LinkButton } from "@astrojs/starlight/components";
 import MiniRepl from "../../../components/MiniRepl.astro";
 
 Der Plan wäre, als nächstes mal verschiedene Beats auszuprobieren. Dafür gibt es natürlich Noten, die zwar ähnlich aussehen, aber doch ziemlich anders zu verstehen sind als z.B. Noten für Gesang oder Melodieinstrumente. Schaut Euch das mal an:
@@ -41,3 +41,7 @@ Versuchen wir mal zusammen, den Beat umzusetzen!
 {/* <MiniRepl name='everyones_first_drum_beat' tune={`s("bd ~ [bd bd] ~, [~ sd]*2, hh*8")`}/> */}
 
 <MiniRepl name='everyones_first_drum_beat'/>
+
+**Probiert es selbst!**
+
+<LinkButton icon='right-arrow' href="../../exercises/02_scored_beats/">Übungen: Beats nach Schlagzeug-Noten</LinkButton>
