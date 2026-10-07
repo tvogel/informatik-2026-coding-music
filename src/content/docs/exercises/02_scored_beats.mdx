@@ -2,11 +2,31 @@
 title: "Übungen 2: Beats nach Noten"
 description: Übungen zum Übertragen von Schlagzeug-Noten in Strudel-Patterns
 ---
+import { YouTube } from 'astro-embed';
 import VexFlow from "../../../components/VexFlow.astro";
 import { LinkCard, LinkButton } from '@astrojs/starlight/components';
 import MiniRepl from "../../../components/MiniRepl.astro";
 import Answer from '../../../components/Answer.astro';
 import dedent from "dedent";
+
+In diesen Übungen lernt ihr verschiedene Rhythmen kennen und probiert, diese in
+Strudel zu programmieren. Es gibt viele verschiedene Möglichkeiten, den gleichen
+Beat in Strudel zu schreiben.
+
+:::tip
+Manche Rhythmen sind etwas hektisch, wenn man die standardmäßigen 30 Zyklen pro
+Minute verwendet, probiert dann
+```js
+setcpm(80); // oder 60 oder so
+```
+
+Oder geht höher, wenn Euch danach ist!
+:::
+
+Diese Beats findet Ihr übrigens auch alle in diesem Video:
+
+<YouTube id="mwe4HPOiUms" posterQuality="max"/>
+
 
 ## 4 On The Floor
 
