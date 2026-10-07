@@ -48,7 +48,6 @@ import dedent from "dedent";
         f.StaveNote({ keys: [bd, hh], duration: '4'}).addModifier(f.Articulation({ type: 'ah' }), 0),
       ]);
 
-    console.log({voice0})
     system.addStave({
         spaceAbove: 1,
         voices: [
@@ -79,7 +78,6 @@ import dedent from "dedent";
       ]);
     for (let i = 1; i < voice0.getTickables().length; i += 2)
       f.Beam({ notes: voice0.getTickables().slice(i-1, i+1) /* as StemmableNote[] */ });
-    console.log({voice0})
     system.addStave({
         spaceAbove: 1,
         voices: [
@@ -112,7 +110,6 @@ import dedent from "dedent";
       ]);
     for (let i = 1; i < voice0.getTickables().length; i += 2)
       f.Beam({ notes: voice0.getTickables().slice(i-1, i+1) });
-    console.log({voice0})
     system.addStave({
         spaceAbove: 1,
         voices: [
@@ -144,7 +141,6 @@ import dedent from "dedent";
       ]);
     for (let i = 1; i < voice0.getTickables().length; i += 2)
       f.Beam({ notes: voice0.getTickables().slice(i-1, i+1) });
-    console.log({voice0})
     system.addStave({
         spaceAbove: 1,
         voices: [
@@ -176,7 +172,6 @@ import dedent from "dedent";
       ]);
     for (let i = 1; i < voice0.getTickables().length; i += 2)
       f.Beam({ notes: voice0.getTickables().slice(i-1, i+1) });
-    console.log({voice0})
     system.addStave({
         spaceAbove: 1,
         voices: [
@@ -209,7 +204,6 @@ import dedent from "dedent";
     f.Beam({ notes: voice0.getTickables().slice(0, 2) });
     f.Beam({ notes: voice0.getTickables().slice(2, 4) });
 
-    console.log({voice0})
     system.addStave({
         spaceAbove: 1,
         voices: [
@@ -250,7 +244,6 @@ import dedent from "dedent";
     for (let i = 3; i < voice0.getTickables().length; i += 4)
       f.Beam({ notes: voice0.getTickables().slice(i-3, i+1) });
 
-    console.log({voice0})
     system.addStave({
         spaceAbove: 1,
         voices: [
@@ -286,7 +279,6 @@ import dedent from "dedent";
     f.Beam({ notes: voice0.getTickables().slice(5, 7) });
     f.Beam({ notes: voice0.getTickables().slice(7, 9) });
 
-    console.log({voice0})
     system.addStave({
         spaceAbove: 1,
         voices: [
@@ -321,7 +313,6 @@ import dedent from "dedent";
     f.Beam({ notes: voice0.getTickables().slice(4, 6) });
     f.Beam({ notes: voice0.getTickables().slice(6, 8) });
 
-    console.log({voice0})
     system.addStave({
         spaceAbove: 1,
         voices: [
@@ -360,7 +351,6 @@ import dedent from "dedent";
     f.Beam({ notes: voice0.getTickables().slice(5, 8) });
     f.Beam({ notes: voice0.getTickables().slice(8, 10) });
 
-    console.log({voice0})
     system.addStave({
         spaceAbove: 1,
         voices: [
@@ -408,7 +398,6 @@ s("....").gain("...")
     f.Beam({ notes: voice0.getTickables().slice(5, 8) });
     f.Beam({ notes: voice0.getTickables().slice(8, 10) });
 
-    console.log({voice0})
     system.addStave({
         spaceAbove: 1,
         voices: [
@@ -443,7 +432,6 @@ s("....").gain("...")
     f.Beam({ notes: voice0.getTickables().slice(4, 6) });
     f.Beam({ notes: voice0.getTickables().slice(6, 8) });
 
-    console.log({voice0})
     system.addStave({
         spaceAbove: 1,
         voices: [
@@ -480,7 +468,6 @@ s("....").gain("...")
     f.Beam({ notes: voice0.getTickables().slice(4, 6) });
     f.Beam({ notes: voice0.getTickables().slice(6, 8) });
 
-    console.log({voice0})
     system.addStave({
         spaceAbove: 1,
         voices: [
@@ -534,7 +521,6 @@ Damit bekommst Du eine passende Ride und Ride Bell!
     f.Beam({ notes: voice0.getTickables().slice(5, 7) });
     f.Beam({ notes: voice0.getTickables().slice(7, 10) });
 
-    console.log({voice0})
     system.addStave({
         spaceAbove: 1,
         voices: [
@@ -570,7 +556,6 @@ Damit bekommst Du eine passende Ride und Ride Bell!
     f.Beam({ notes: voice0.getTickables().slice(2, 4) });
     f.Beam({ notes: voice0.getTickables().slice(4, 6) });
 
-    console.log({voice0})
     system.addStave({
         spaceAbove: 1,
         voices: [
@@ -610,7 +595,6 @@ Damit bekommst Du eine passende Ride und Ride Bell!
     f.Beam({ notes: voice0.getTickables().slice(4, 7) });
     f.Beam({ notes: voice0.getTickables().slice(7, 9) });
 
-    console.log({voice0})
     system.addStave({
         spaceAbove: 1,
         voices: [
@@ -669,7 +653,6 @@ s("cs")
     f.Beam({ notes: voice0.getTickables().slice(8, 12) });
     f.Beam({ notes: voice0.getTickables().slice(12, 16) });
 
-    console.log({voice0})
     system.addStave({
         spaceAbove: 1,
         voices: [
@@ -719,7 +702,6 @@ s("cs")
     f.Beam({ notes: voice0.getTickables().slice(8, 12) });
     f.Beam({ notes: voice0.getTickables().slice(12, 14) });
 
-    console.log({voice0})
     system.addStave({
         spaceAbove: 1,
         voices: [
