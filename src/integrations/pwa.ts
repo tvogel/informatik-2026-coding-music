@@ -135,6 +135,7 @@ function manifestTransform(ctx: PWAContext): ManifestTransform {
       if (!entry?.url.endsWith(".html")) continue;
 
       const url = entry.url.startsWith("/") ? entry.url.slice(1) : entry.url;
+      if (url === "404.html") continue;
       if (url === "index.html") {
         extraEntries.push({
           ...entry,
