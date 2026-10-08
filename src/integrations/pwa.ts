@@ -67,6 +67,7 @@ export default function pwa(
 
         let plugins = VitePWA({
           ...rest,
+          base: ctx.scope,
           strategies: "generateSW",
           // Astro emits the icons itself; workbox must not re-inject them.
           includeManifestIcons: false,
@@ -134,7 +135,6 @@ function manifestTransform(ctx: PWAContext): ManifestTransform {
       if (!entry?.url.endsWith(".html")) continue;
 
       const url = entry.url.startsWith("/") ? entry.url.slice(1) : entry.url;
-      entry.url = ctx.scope + url;
       if (url === "index.html") {
         extraEntries.push({
           ...entry,
@@ -153,7 +153,7 @@ function manifestTransform(ctx: PWAContext): ManifestTransform {
       if (ctx.trailingSlash === "always") newUrl += "/";
       extraEntries.push({
         ...entry,
-        url: ctx.scope + newUrl,
+        url: newUrl,
       });
     }
 
