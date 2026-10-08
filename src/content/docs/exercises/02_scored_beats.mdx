@@ -11,13 +11,13 @@ import dedent from "dedent";
 
 In diesen Übungen lernt ihr verschiedene Rhythmen kennen und probiert, diese in
 Strudel zu programmieren. Es gibt viele verschiedene Möglichkeiten, den gleichen
-Beat in Strudel zu schreiben.
+Beat in Strudel zu schreiben. Probiere unterschiedliche Strategien aus!
 
 :::tip
 Manche Rhythmen sind etwas hektisch, wenn man die standardmäßigen 30 Zyklen pro
 Minute verwendet, probiert dann
 ```js
-setcpm(80); // oder 60 oder so
+setcpm(20); // oder 15 oder so
 ```
 
 Oder geht höher, wenn Euch danach ist!
@@ -27,6 +27,20 @@ Diese Beats findet Ihr übrigens auch alle in diesem Video:
 
 <YouTube id="mwe4HPOiUms" posterQuality="max"/>
 
+## Klang-Varianten
+
+Wenn Ihr musikalisch mehr Abwechslung sucht, könnt Ihr verschiedene Varianten
+eines Klangs ausprobieren. Dazu schreibt man hinter den Klang eine Zahl, z.B.
+`bd:3`.
+
+:::tip[Frage]{icon="comment"}
+Wie viele `bd`-Sounds gibt es? Was passiert, wenn man höhere Zahlen angibt?
+:::
+
+Man kann auch allen Klängen in einem `s("...")`-Muster auf einmal eine andere
+Variante zuordnen, indem man z.B. `s("...").n(6)` schreibt.
+
+Probiert das gerne bei den folgenden Aufgaben aus!
 
 ## 4 On The Floor
 
