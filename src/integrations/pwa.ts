@@ -152,7 +152,7 @@ function manifestTransform(ctx: PWAContext): ManifestTransform {
       if (ctx.trailingSlash === "always") newUrl += "/";
       extraEntries.push({
         ...entry,
-        url: newUrl,
+        url: ctx.scope + newUrl,
       });
     }
 
