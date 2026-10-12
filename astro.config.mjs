@@ -3,8 +3,7 @@ import starlight from '@astrojs/starlight';
 import starlightQuiz from 'starlight-quiz';
 import simplestackQuery from '@simplestack/query';
 
-import { defineConfig } from 'astro/config'
-  ;
+import { defineConfig } from 'astro/config';
 import pwa from './src/integrations/pwa';
 
 import mdx from '@astrojs/mdx';
@@ -30,6 +29,8 @@ export default defineConfig({
           { label: 'Willkommen', slug: 'guides/welcome' },
           { label: 'Erste Schritte', slug: 'guides/first_steps' },
           { label: 'Schlagzeug-Noten', slug: 'guides/drum_notation' },
+          { label: 'Schallwellen', slug: 'guides/physical_sounds' },
+          { label: 'Melodien', slug: 'guides/melodies' },
           // { label: 'Pianoroll bug', slug: 'guides/bug' },
         ],
       },
@@ -38,9 +39,10 @@ export default defineConfig({
         items: [{ autogenerate: { directory: 'exercises' } }],
       },
       {
-        label: 'Dokumentation',
+        label: 'Strudel',
         items: [
-          { label: 'Strudel', link: 'https://strudel.cc/learn' }
+          { label: 'Dokumentation', link: 'https://strudel.cc/learn' },
+          { label: 'REPL', link: 'https://strudel.cc/' }
         ],
       },
     ],

@@ -21,9 +21,9 @@ const id = crypto.randomUUID();
   </div></RootElement
 >
 <script>
-  import VexFlow, { Factory } from "vexflow";
+  import * as VexFlow from "vexflow";
 
-  function setFgColor(factory: Factory, fgColor: string) {
+  function setFgColor(factory: VexFlow.Factory, fgColor: string) {
     const fgStyle = {
       strokeStyle: fgColor,
       fillStyle: fgColor,
@@ -53,9 +53,23 @@ const id = crypto.randomUUID();
 
     const func = new Function(`return (${code})`)();
 
+    interface TvVexFlowFactory extends VexFlow.Factory {
+      textNote: (text: string, duration: string) => VexFlow.TextNote;
+    }
+
     const factory = new VexFlow.Factory({
       renderer: { elementId: target.id, width, height },
-    });
+    }) as TvVexFlowFactory;
+
+    factory.textNote = function (
+      text: string,
+      duration: string,
+      line: number = 0,
+    ) {
+      return this.TextNote({ text, duration, line }).setJustification(
+        VexFlow.TextNote.Justification.CENTER,
+      );
+    };
 
     function render() {
       target.replaceChildren();
@@ -63,9 +77,20 @@ const id = crypto.randomUUID();
       const style = window.getComputedStyle(document.body);
       const fgColor = style.getPropertyValue("--sl-color-text") || "white";
       factory.initRenderer();
-      const score = factory.EasyScore({ commitHooks: [commitHook] });
-      VexFlow.setFonts("Bravura");
-      func(VexFlow, factory, score);
+
+      interface TvEasyScore extends VexFlow.EasyScore {
+        lazyVoice: (notes: VexFlow.Tickable[]) => VexFlow.Voice;
+      }
+      const score = factory.EasyScore({
+        commitHooks: [commitHook],
+      }) as TvEasyScore;
+
+      score.lazyVoice = function (notes: VexFlow.Tickable[]) {
+        return this.voice([]).setStrict(false).addTickables(notes);
+      };
+
+      VexFlow.VexFlow.setFonts("Bravura");
+      func(VexFlow.VexFlow, factory, score);
       setFgColor(factory, fgColor);
       factory.getContext().scale(1.25, 1.25);
       factory.draw();

@@ -1,0 +1,160 @@
+---
+title: "Töne, Geräusche, Schwingungen"
+description: "Wir schauen uns an, was Töne sind"
+---
+
+import { LinkCard, LinkButton } from "@astrojs/starlight/components";
+import InnenOhr from '../../../assets/Anatomy_of_the_Human_Ear.svg';
+import Mikrofon from '../../../assets/Tauchspulenmikrofon.svg';
+import Lautsprecher from '../../../assets/Lautsprecher_Schema.svg';
+
+Bevor wir beginnen, Melodien zu schreiben, schauen wir uns erst mal kurz an, was
+Töne eigentlich sind, wie sie in der Natur entstehen, wie wir sie hören und wie
+sie elektronisch verarbeitet werden.
+
+## Schallwellen und Wahrnehmung
+
+Dass es Geräusche, Töne oder physikalisch _Schallwellen_ gibt, ist eine
+Eigenschaft der Luft. Die Teilchen, aus der die Luft besteht (Stickstoff,
+Sauerstoff, Argon und Spuren von Kohlendioxid, weiteren Edelgasen, Wasserdampf,
+Wasserstoff, Ozon, ..) sind durch die Anziehungskraft der Erde über dem Erdboden
+so dicht zusammengedrängt, dass sie ständig gegeneinander stoßen.
+
+Dadurch verteilen sich die Teilchen gleichmäßig, können sich aber mehr oder
+weniger gleichmäßig bewegen, z.B. als Wind. Wenn etwas geschieht, was einen
+Schall auslöst, z.B. beim Klatschen in die Hände, werden Luftteilchen durch eine
+Bewegung angestoßen und geben diesen Impuls weiter an die umgebenden Teilchen.
+Dieser Vorgang setzt sich fort und kann in einiger Entfernung von der
+Schallquelle Bewegungen auch an Festkörpern hervorrufen, wie z.B. dem
+Trommelfell in unserem Ohr. Das Trommelfell setzt Knöchelchen in Bewegung, die
+die Flüssigkeit in der Hörschnecke in Vibrationen versetzt, die von Härchen an
+der inneren Oberfläche der Schnecke gespürt und als Signal über den Hörnerv
+ins Gehirn geleitet und so von uns wahrgenommen wird.
+
+<div style="display:flex; justify-content:center; background: white">
+<InnenOhr width="40rem" alt="Skizze des Aufbaus des menschlichen Ohrs"/>
+</div>
+Quelle: [Wikipedia](https://commons.wikimedia.org/wiki/File:Anatomy_of_the_Human_Ear.svg?lang=de)
+
+Weil die Teilchen immer ein Stück fliegen müssen und dafür Zeit benötigen, bevor
+sie auf das nächste Teilchen treffen, findet die Schallausbreitung mit einer
+bestimmten Geschwindigkeit statt, der _Schallgeschwindigkeit_. Sie beträgt bei
+typischen Bedingungen an der Erdoberfläche etwa 343 Meter pro Sekunde bei 20°C
+und 331 Meter pro Sekunde bei 0°C. (Die Schallgeschwindigkeit ist übrigens
+geringer als die durchschnittliche Teilchengeschwindigkeit.)
+
+<LinkCard
+  title="Simulation von Schallausbreitung durch Gasteilchen"
+  description="In dieser Simulation wird verdeutlicht, wie sich Schallwellen durch
+die ständigen, zufälligen Stöße zwischen den Teilchen ausbreiten können.
+Wichtig: Es werden nicht alle Teilchen gezeigt, sondern nur eine Stichprobe! Man
+kann also nicht alle Stöße sehen."
+  href="https://javalab.org/en/tuning_fork_and_sound_wave_en/"
+/>
+
+## Geräusche vs. Töne
+
+Das Händeklatschen, eine Bass-Drum oder Snare-Drum unterscheidet sich stark von
+Tönen wie einem Pfiff, Vogelstimmen, Gesang oder Melodieinstrumenten. Diese
+zeichnen sich durch eine (mehr oder weniger) gleichbleibende Tonhöhe aus. Auch
+Trommeln mit einer schwingenden Membran (wie die Toms) oder Becken/Gongs haben
+eine deutliche Tonhöhe. Gemeinsam mit den Geräuschen haben sie, dass man sie in
+einer bestimmte Lautstärke wahrnimmt, die sich über die Zeit verändert.
+
+Die Tonhöhe entsteht durch sich wiederholende Bewegungen. Bei einer Gitarre oder
+Violine schwingen die Saiten, bei einer Flöte der Luftraum im Inneren, genau wie
+beim Gesang. Dort wo die Schallquelle an den Außenraum mündet, überträgt sich
+die Bewegung auf die Luft und wird weitertransportiert. Weil die Bewegungen
+aufeinander folgen, kommen die Bewegungen dann auch nacheinander im Ohr an.
+So lässt sich der charakteristische Ton in unterschiedlichen Entfernungen in
+gleicher (zumindest ähnlicher) Weise hören.
+
+Die physikalische Größe für die Tonhöhe ist die Frequenz. Sie gibt an, wie oft
+eine Schwingung pro Zeit erfolgt. Man misst sie in der Einheit "Hertz",
+abgekürzt "Hz". Wenn eine Schwingung eine Frequenz von einem Hertz hat, bedeutet
+dass, dass eine Schwingung pro Sekunde stattfindet.
+
+Das menschliche Ohr kann Frequenzen zwischen 16 und 20.000 Hz wahrnehmen. (Das
+nimmt mit dem Alter meist am oberen Ende deutlich ab.) Der heute übliche
+_Kammerton A_, auf den Instrumente gestimmt werden, hat eine Frequenz von 440 Hz.
+
+Wie die Form der Bewegung die Wahrnehmung von Lautstärke, Tonhöhe und Klangfarbe
+beeinflusst, kann man gut mit einem _Funktionsgenerator_ ausprobieren:
+
+<LinkCard
+  title="Funktionsgenerator"
+  description="Ein Funktionsgenerator erlaubt es, unterschiedliche Wellenformen zu
+erzeugen und zu hören."
+  href="https://funktionsgenerator.online/"
+/>
+
+Instrumente erzeugen neben dem Grundton, den man als die Höhe des Tons wahrnimmt,
+weil er der lauteste Anteil des Klangs ist, oft ein _Spektrum an Obertönen_. Wie
+Obertöne den Klang bestimmen kann man mit diesem Tongenerator ausprobieren:
+
+<LinkCard
+  title="Obertongenerator"
+  description="Zu dem Grundton werden doppelt, dreifach, ... so hohe Töne
+hinzugemischt, um die Klangfarbe zu verändern"
+  href="https://www.casparjohanneswalter.de/research/soundgen"
+/>
+
+:::tip[Demonstration]{icon="telegram"}
+Obertöne bei der Geige: Flageolett-Töne
+:::
+
+## Elektrische Wandlung
+
+### Mikrofon
+
+Ähnlich wie im Ohr kann Schall auch mechanische Systeme zu Bewegungen anregen.
+Bei einem Mikrofon bewegt der Schall eine Membran, an der eine feine (leichte)
+Spule angebracht ist. Diese befindet sich berührungslos in der Nähe eines starr
+befestigten Permanentmagneten. Bewegt sich die Spule im Magnetfeld, so
+induziert das zwischen den gegenüberliegenden Enden des Leiters eine elektrische
+Spannung. Diese ist um so höher, je schneller sich die Spule bewegt. Sie kann
+(meist über einen Mikrofonverstärker) elektronisch weiterverarbeitet, z.B.
+gemessen werden.
+
+<div style="display:flex; justify-content:center; background: white">
+<Mikrofon viewBox="0 0 800 500" width="40rem" height={undefined}
+ alt="Skizze des Aufbaus eines Tauchspulenmikrofons"/>
+</div>
+Quelle: [Wikipedia](https://commons.wikimedia.org/wiki/File:Tauchspulenmikrofon.svg)
+
+Dieser Aufbau ist ein *dynamisches Mikrofon*. Es gibt andere Mikrofontypen, die
+andere physikalische Effekte nutzen, um die Schallbewegung in eine elektrische
+Spannung zu wandeln.
+
+### Lautsprecher und Kopfhörer
+
+Umgekehrt lässt sich aus elektrischen Signalen wieder Schall erzeugen. Das geht
+bei Lautsprechern und Kopfhörern praktisch gleich, nur mit sehr
+unterschiedlichen Leistungen. Der Aufbau eines Lautsprechers ähnelt erstaunlich
+stark dem eines dynamischen Mikrofons. Wieder befindet sich eine elektrische
+Spule berührungslos in der Nähe eines festen Permanentmagneten und ist mit einer
+beweglichen Membran verbunden. Beim Lautsprecher allerdings wird eine
+elektrische Spannung an der Spule angelegt. Dadurch fließt ein Strom durch die
+Spule und eine stromdurchflossene Spule erfährt im magnetischen Feld eine Kraft.
+Dadurch bewegt die Spule die Membran. Die Membran gibt den Luffteilchen einen
+Stoß und löst eine Schallwelle aus.
+
+Tatsächlich funktionieren Lautsprecher auch als Mikrofon, allerdings sind sie
+nicht auf die optimale Messung von Schall optimiert, sondern eben auf die
+Erzeugung.
+
+<div style="display:flex; justify-content:center; background: white">
+<Lautsprecher viewBox="0 0 330 190" width="40rem" height={undefined} alt="Skizze des Aufbaus eines Lautsprechers"/>
+</div>
+Quelle: [Wikipedia](https://commons.wikimedia.org/wiki/File:Lautsprecher_Schema.svg)
+
+:::tip[Demonstration]{icon="telegram"}
+Beobachtung des Spannungsverlaufs an einem Lautsprecher mithilfe eines
+Oszilloskops, verschiedene Frequenzen, Wellenformen, Beats vs. Töne
+:::
+
+## Zurück zum Musik-Programmieren
+
+Mit diesem Wissen im Hinterkopf, lasst uns wieder Musik machen:
+
+<LinkButton icon='right-arrow' href="../../guides/melodies/">Melodien programmieren</LinkButton>

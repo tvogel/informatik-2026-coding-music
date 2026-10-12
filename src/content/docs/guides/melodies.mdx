@@ -1,0 +1,133 @@
+---
+title: Melodien programmieren
+description: Ein Beat alleine macht (meist) noch keinen Hit
+---
+import VexFlow from "../../../components/VexFlow.astro";
+import { LinkCard, LinkButton } from "@astrojs/starlight/components";
+import MiniRepl from "../../../components/MiniRepl.astro";
+
+Der wesentliche Unterschied zu den Schlagzeug-Mustern: Wir brauchen jetzt
+verschiedene Tonhöhen!
+
+## Noten in Strudel
+
+In Strudel werden Tonhöhen mit dem Befehl `note()` angegeben. Man kann entweder
+sogenannte **MIDI-Notennummern** verwenden, oder die üblicheren Notennamen
+verwenden. Einen vollständigen Überblick über die MIDI-Notennummern findet Ihr
+hier (für Strudel gilt die Spalte "Note 2"!):
+
+<LinkCard title="MIDI-Notennummern"
+description="Alle 128 MIDI-Noten im Überblick"
+href="https://www.zem-college.de/midi/mc_taben.htm" />
+
+Der Vorteil der MIDI-Notennummern: Sie sind einfach in Halbtonschritten
+durchnummeriert. Wenn man also eine Melodie hat, und sie zwei Ganztöne höher
+haben will, braucht man nur zu allen Nummern die Zahl 4 addieren.
+
+<MiniRepl name='first_tune' tune={`note("76 74 76 72 67 72 64@2")`}/>
+
+Zwei Ganztöne höher:
+
+<MiniRepl name='first_tune_trans' tune={`note("80 78 80 76 71 76 68@2")`}/>
+
+:::tip[Frage]{icon=comment}
+Was könnte das `@2` hier bedeuten?
+:::
+
+Die wenigsten sind allerdings geübt, in MIDI-Notennummern Melodien zu
+schreiben. Üblicher sind die Buchstaben "CDEFGAHC", bzw. im Englischen und auch
+in Strudel "CDEFGABC", d.h. statt "H" verwendet man (auch ein bisschen
+logischer) das "B". Im Englischen geht das, weil man zum Halbton unter "H" nicht
+"B" sagt, sondern "B flat". Die erhöhten heißen nicht "Cis" usw., sondern
+"C sharp". Um die Oktave anzugeben, kommt noch eine Zahl dahinter. Das "C" in
+der Mitte einer Klaviatur ist "C4", der Kammerton "A" mit 440 Hz ist "A4".
+
+<VexFlow width={800} code={`(VexFlow, factory, score) => {
+    const appendSystem = (width /*: number*/) => {
+      const prevStave = factory.getStave();
+      const x = (prevStave?.getX() + prevStave?.getWidth()) || 0;
+      const y = prevStave?.getY() || 0;
+      const system = factory.System({ x, y, width, spaceBetweenStaves: 10 });
+      return system;
+    }
+
+    let system = appendSystem(undefined);
+    system.addStave({
+        spaceAbove: 2,
+        voices: [
+          score.lazyVoice(score.notes('c4/q, c#4, d4, d#4, e4, f4, f#4, g4, g#4, a4, a#4, b4, c5')),
+          score.lazyVoice("C4, C♯4, D4, D♯4, E4, F4, F♯4, G4, G♯4, A4, A♯4, B4, C5"
+            .split(', ').map(x =>factory.textNote(x, '4'))),
+        ],
+      })
+      .addClef("treble");
+      // .addTimeSignature("4/4");
+  }`} />
+
+  <VexFlow width={800} code={`(VexFlow, factory, score) => {
+    let x = 0, y = 0;
+
+    const appendSystem = (width /*: number*/) => {
+      const prevStave = factory.getStave();
+      const x = (prevStave?.getX() + prevStave?.getWidth()) || 0;
+      const y = prevStave?.getY() || 0;
+      const system = factory.System({ x, y, width, spaceBetweenStaves: 10 });
+      return system;
+    }
+
+    let system = appendSystem(undefined);
+    system.addStave({
+        spaceAbove: 1,
+        voices: [
+          score.lazyVoice(score.notes('c4/q, db4, d4, eb4, e4, f4, gb4, g4, ab4, a4, bb4, b4, c5')),
+          score.lazyVoice("C4, D♭4, D4, E♭4, E4, F4, G♭4, G4, A♭4, A4, B♭4, B4, C5"
+            .split(', ').map(x =>factory.textNote(x, '4')))
+        ],
+      })
+      .addClef("treble");
+      // .addTimeSignature("4/4");
+  }`} />
+
+Die kleine Melodie von oben sieht in dieser Schreibweise so aus:
+
+<MiniRepl name='first_tune_names' tune={`note("e5 d5 e5 c5 g4 c5 e4@2")`}/>
+
+Und die zwei Ganztöne höhere sieht doch schon ziemlich anders aus wegen der
+ungleichmäßig verteilten Halbtöne:
+
+<MiniRepl name='first_tune_trans_names' tune={`note("g#5 f#5 g#5 e5 b4 e5 g#4@2")`}/>
+
+## Instrumente in Strudel
+
+:::tip[Frage]{icon="comment"}
+Wir haben bisher kein Instrument ausgewählt. An was hat Euch der Klang erinnert?
+:::
+
+Um ein Instrument auszuwählen, verwenden wir wieder den bekannten
+`sound()`-Befehl bzw. kurz `s()`, den wir schon vom Schlagzeug kennen.
+
+<MiniRepl name='first_tune_with_sound' tune={`note("e5 d5 e5 c5 g4 c5 e4@2").s("piano")`}/>
+
+
+:::tip[Frage]{icon="comment"}
+Klappt es auch, wenn man `s()` und `note()` vertauscht? Wie sieht es mit
+Varianten aus, also `n()` oder `:2` usw.?
+:::
+
+Eine Liste der verfügbaren Instrumente findet Ihr im großen
+[Strudel-REPL](https://strudel.cc) im Reiter "Sounds"!
+
+## Melodien mit Beat
+
+Und bevor Ihr jetzt selbst loslegt noch wichtig: Strudel kann (natürlich)
+mehrere Cycles synchron abspielen - Ihr habt es vielleicht schon im Video von
+Switch Angel bemerkt.
+
+Strudel sucht dazu nach allen Zeilen, die durch `$:` am Anfang markiert sind,
+sammelt die Muster zusammen und spielt sie gemeinsam ab. Beispiel:
+
+<MiniRepl name='first_tune_with_beats'
+tune={`$: note("e5 d5 e5 c5 g4 c5 e4@2").s("gm_xylophone")
+$: s("bd sd bd sd, hh*8").n(1)`}/>
+
+<LinkButton icon='right-arrow' href="../../exercises/03_first_tunes/">Übungen: Melodien mit Beats</LinkButton>
