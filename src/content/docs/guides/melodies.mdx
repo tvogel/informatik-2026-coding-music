@@ -130,4 +130,51 @@ sammelt die Muster zusammen und spielt sie gemeinsam ab. Beispiel:
 tune={`$: note("e5 d5 e5 c5 g4 c5 e4@2").s("gm_xylophone")
 $: s("bd sd bd sd, hh*8").n(1)`}/>
 
+## Melodien länger als ein Zyklus
+
+Um längere Melodien zu schreiben, hat man in Strudel mehrere Möglichkeiten. Um
+ein Muster z.B. auf vier Zyklen zu verteilen, kann man `.slow(4)` an das Muster
+anhängen:
+
+<MiniRepl name='four_bar_tune' tune={`$:note("c4 e4 c4 e4 f4 a4 f4 a4 c4 e4 c4 e4 f4 a4 g4 b4")
+.slow(4)
+.s("gm_xylophone")
+$:s("bd hh!3")`}/>
+
+Oder man kann die verschiedenen Takte als Alternativen hintereinander schreiben.
+Das ist ein bisschen übersichtlicher, weil man die Taktgrenzen leicht erkennt:
+
+<MiniRepl name='four_bar_tune_alt' tune={`$:note(\`<
+       [c4 e4 c4 e4]
+       [f4 a4 f4 a4]
+       [c4 e4 c4 e4]
+       [f4 a4 g4 b4]
+       >\`)
+.s("gm_xylophone")
+$:s("bd hh!3")`}/>
+
+:::caution
+In JavaScript (und damit auch in Strudel) funktionieren Text-Ausdrücke in
+doppelten Anführungszeichen nur innerhalb einer Zeile. Für mehrzeiligen Text
+braucht man sogenannte "Back-Ticks" (accent grave):
+```
+`erste Zeile
+zweite Zeile
+letzte Zeile`
+```
+Das Zeichen findet Ihr auf der Taste zwischen Eszett und Rücktaste (mit Shift)!
+:::
+
+Man kann auch die vier Takte in ein `[...]/4` einpacken, um sie eben viermal
+langsamer abzuspielen (diesmal in Moll, damit es nicht langweilig wird):
+
+<MiniRepl name='four_bar_tune_slash' tune={`$:note(\`[
+        [c4 eb4 c4 eb4]
+        [f4 ab4 f4 ab4]
+        [c4 eb4 c4 eb4]
+        [f4 ab4 g4 b4]
+        ]/4\`)
+.s("gm_xylophone")
+$:s("bd hh!3")`}/>
+
 <LinkButton icon='right-arrow' href="../../exercises/03_first_tunes/">Übungen: Melodien mit Beats</LinkButton>
