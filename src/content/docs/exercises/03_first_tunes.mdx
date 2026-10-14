@@ -14,10 +14,71 @@ Ihr könnt auch versuchen, für einen Song, den Ihr mögt, im Internet Noten zu
 finden. Solche Noten dürfte ich meist auch gar nicht ins öffentliche
 Kursmaterial übernehmen.
 
-## Euer erster Melodie-Loop
-
 Viel Spaß!
 
+## Euer erster Melodie-Loop
+
 <MiniRepl name='my_first_loop'/>
+
+## Vorschläge für weitere Melodie-Improvisationen:
+
+### Läufe durch Tonleitern
+
+Probiere Melodien aus, die aus aufeinanderfolgenden Ganz- und Halbtönen bestehen.
+Benutze MIDI-Notennumern und/oder Notennamen (mit Vorzeichen `#` oder `b`).
+Variiere den Rhythmus der Melodie und vielleicht die Lautstärke der einzelnen Töne durch
+ein Muster für den `.gain()`-Befehl, z.B. `.gain("0.8 0.5 1 0.5").
+
+Probiere unterschiedliche Schlagzeug-Rhythmen dazu aus.
+
+Probiere, phasenweise aufwärts und abwärts zu laufen.
+
+<MiniRepl name='scale_runs'/>
+
+### Alternierende Melodien
+
+Probiere Melodien aus, die aus abwechselnden Tönen bestehen: Welche Tonabstände
+klingen für Dich interessant? Welche Rhythmen sind gut dafür?
+
+<MiniRepl name='alternating_melodies'/>
+
+### Melodien rückwärts
+
+Probiere aus, wie sich das anhört, wenn man eine gut klingende Melodie rückwärts
+abspielt (indem Du die Noten rückwärts eingibst). Wie klingt das, wenn man die
+Melodie vorwärts und rückwärts gleichzeitig spielt?
+
+<MiniRepl name='backwards_melodies'/>
+
+### Parallele Melodien
+
+Wie klingt es, wenn Du die gleiche Melodie gleichzeitig ein zweites Mal
+programmierst, aber alle Töne etwas höher oder tiefer spielst. Probiere dann,
+an einzelnen Stellen von der parallelen Bewegung abzuweichen.
+
+<MiniRepl name='parallel_melodies'/>
+
+### Bass-Stimme
+
+Nimm eine Melodie und mache eine Bass-Stimme dazu: Kopiere die Melodie, mach
+sie eine ganzes Stück tiefer, z.B. ein oder zwei Oktaven (das sind 12 bzw. 24
+Halbtöne) oder ein oder zwei Quinten (das sind 7 bzw. 14 Halbtöne). Oder
+probiere es nach Gefühl.
+
+Dann lass einzelne Töne weg und mache die übrigen länger. Welche Töne sollten
+bleiben, damit es gut klingt? Wähle vielleicht ein anderes Instrument für den
+Bass.
+
+<MiniRepl name='making_bass'/>
+
+### Bonus: Mehr Stereo
+
+Probiere aus, die verschiedenen Stimmen (Melodie, Bass, Schlagzeug)
+unterschiedlich weit link/rechts zu platzieren. Probiere dazu aus, was `.pan(1)`
+macht, probiere andere Werte. Kann man auch ein Muster verwenden (wie bei
+`.gain()`)?
+
+<MiniRepl name='panning'/>
+
 
 {/* <LinkButton icon='right-arrow' href="../../guides/physical_sounds/">Töne, Geräusche, Schwingungen</LinkButton> */}
