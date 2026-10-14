@@ -31,7 +31,8 @@ export default defineConfig({
           { label: 'Schlagzeug-Noten', slug: 'guides/drum_notation' },
           { label: 'Schallwellen', slug: 'guides/physical_sounds' },
           { label: 'Melodien', slug: 'guides/melodies' },
-          // { label: 'Pianoroll bug', slug: 'guides/bug' },
+          { label: 'Tonleitern', slug: 'guides/scales' },
+          { label: 'Zufälligkeiten', slug: 'guides/randomness' },
         ],
       },
       {

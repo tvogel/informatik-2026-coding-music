@@ -1,0 +1,275 @@
+---
+title: Tonleitern
+description: Tonleitern vereinfachen die Programmierung von Melodien
+---
+import VexFlow from "../../../components/VexFlow.astro";
+import { LinkCard, LinkButton } from "@astrojs/starlight/components";
+import MiniRepl from "../../../components/MiniRepl.astro";
+
+Ihr habt vielleicht bemerkt, oder wisst schon aus Musik- oder Instrumentenunterricht,
+dass man je nach Tonart nicht alle, sondern eine bestimmte Auswahl der Töne
+verwendet.
+
+## Dur-Tonleitern
+
+Die typische C-Dur-Tonleiter, z.B., verwendet nur die Töne, die kein "♯" oder
+"♭" haben. Dadurch hat die C-Dur-Tonleiter zwischen dem 3. und 4. Ton und dem
+7. und 8. Ton einen Halbton. Das sind die Stellen, an denen bei einem Klavier
+die schwarzen Tasten "fehlen". Alle anderen Abstände sind Ganztöne.
+
+<VexFlow width={800} code={`(VexFlow, factory, score) => {
+    const appendSystem = (width /*: number*/) => {
+      const prevStave = factory.getStave();
+      const x = (prevStave?.getX() + prevStave?.getWidth()) || 0;
+      const y = prevStave?.getY() || 0;
+      const system = factory.System({ x, y, width, spaceBetweenStaves: 10 });
+      return system;
+    }
+
+    let system = appendSystem(500);
+    system.addStave({
+        spaceAbove: 2,
+        voices: [
+          score.lazyVoice(score.notes('c4/q, d4, e4, f4, g4, a4, b4, c5')),
+          score.lazyVoice("C4, D4, E4, F4, G4, A4, B4, C5"
+            .split(', ').map(x =>factory.textNote(x, '4'))),
+        ],
+      })
+      .addClef("treble");
+      // .addTimeSignature("4/4");
+    const voice = system.getVoices()[1];
+    factory.TextBracket({
+      from: voice.getTickables()[2],
+      to: voice.getTickables()[3],
+      text: 'halb',
+      options: {
+        // superscript: 'va',
+        position: 'bottom',
+      },
+    }).setLine(2);
+
+    factory.TextBracket({
+      from: voice.getTickables()[6],
+      to: voice.getTickables()[7],
+      text: 'halb',
+      options: {
+        // superscript: 'va',
+        position: 'bottom',
+      },
+    }).setLine(2);
+
+  }`} />
+
+  Alle Dur-Tonleitern haben diese Struktur, aber dann mehr Vorzeichen.
+  Z.B. E-Dur:
+
+  <VexFlow width={800} code={`(VexFlow, factory, score) => {
+    const appendSystem = (width /*: number*/) => {
+      const prevStave = factory.getStave();
+      const x = (prevStave?.getX() + prevStave?.getWidth()) || 0;
+      const y = prevStave?.getY() || 0;
+      const system = factory.System({ x, y, width, spaceBetweenStaves: 10 });
+      return system;
+    }
+
+    let system = appendSystem(500);
+    system.addStave({
+        spaceAbove: 2,
+        voices: [
+          score.lazyVoice(score.notes('e4/q, f#4, g#4, a4, b4, c#5, d#5, e5')),
+          score.lazyVoice("E4, F♯4, G♯4, A4, B4, C♯5, D♯5, E5"
+            .split(', ').map(x =>factory.textNote(x, '4'))),
+        ],
+      })
+      .addClef("treble")
+      // .addKeySignature("E");
+      // .addTimeSignature("4/4");
+    const voice = system.getVoices()[1];
+    factory.TextBracket({
+      from: voice.getTickables()[2],
+      to: voice.getTickables()[3],
+      text: 'halb',
+      options: {
+        // superscript: 'va',
+        position: 'bottom',
+      },
+    }).setLine(2);
+
+    factory.TextBracket({
+      from: voice.getTickables()[6],
+      to: voice.getTickables()[7],
+      text: 'halb',
+      options: {
+        // superscript: 'va',
+        position: 'bottom',
+      },
+    }).setLine(2);
+
+  }`} />
+
+Das ist mühselig, wenn man es nicht schon gründlich gelernt hat. Außerdem kann
+ein Computer-Programm wie Strudel solche Sachen natürlich prima ausrechnen.
+
+Daher kann man in Strudel einfach sagen, die wievielte Note einer Tonleiter man
+haben möchte. Für C-Dur geht das so:
+
+<MiniRepl name='c_major' tune={`n("0 1 2 3 4 5 6 7").scale("c:major").s("piano")`}/>
+
+:::caution
+In JavaScript/Strudel beginnt die Zählung wie in den meisten Computersprachen
+bei Null und nicht bei Eins. Null bezeichnet also den Grundton der Tonleiter.
+:::
+
+Und dann ist klar: Man kann ganz leicht `e:major` schreiben und die Melodie
+selbst unverändert lassen. Man kann auch eine Oktave dazu angeben, um die
+Tonleiter höher oder tiefer beginnen zu lassen, also `c3` oder `c4` usw..
+
+## Moll-Tonleitern
+
+Dur kommt vom lateinischen "durus", was "hart" bedeutet. Demgegenüber gibt es
+eine Tonleiter, die traditionell als "weicher" empfunden wird. Das lateinische
+Wort für weich ist "mollis". Deswegen heißt diese Tonleiter "Moll-Tonleiter".
+
+Im Englischen übrigens und den meisten anderen Sprachen taucht diese Konnotation
+(Nebenbedeutung) von "weich" und "hart" nicht auf, sondern Dur wird "major" und
+Moll wird "minor" genannt, also "größer" und "kleiner".
+
+In der Moll-Tonleiter gibt es auch zwei Halbtonschritte, und zwar zwischen dem
+2. und 3. Ton und dem 5. und 6. Ton.
+
+Das erklärt auch "major" und "minor": Es bezieht sich auf den Abstand vom
+ersten zum dritten Ton. Dieser ist bei Dur (major) eine "große Terz" (vier
+Halbtöne) und bei Moll (minor) eine "kleine Terz" (drei Halbtöne).
+
+Es gibt auch eine Moll-Tonleiter, die ohne Vorzeichen auskommt, nämlich A-Moll.
+Man nennt sie auch die Moll-Parallele von C-Dur, weil sie die gleichen
+Vorzeichen hat wie C-Dur. Es gibt auch zu allen anderen Dur-Tonleitern
+entsprechende Moll-Parallelen. Sie liegen immer eine kleine Terz tiefer als die
+Dur-Tonleiter.
+
+<VexFlow width={800} code={`(VexFlow, factory, score) => {
+    const appendSystem = (width /*: number*/) => {
+      const prevStave = factory.getStave();
+      const x = (prevStave?.getX() + prevStave?.getWidth()) || 0;
+      const y = prevStave?.getY() || 0;
+      const system = factory.System({ x, y, width, spaceBetweenStaves: 10 });
+      return system;
+    }
+
+    let system = appendSystem(500);
+    system.addStave({
+        spaceAbove: 2,
+        voices: [
+          score.lazyVoice(score.notes('a3/q, b3, c4, d4, e4, f4, g4, a4')),
+          score.lazyVoice("A3, B3, C4, D4, E4, F4, G4, A4"
+            .split(', ').map(x =>factory.textNote(x, '4'))),
+        ],
+      })
+      .addClef("treble");
+      // .addTimeSignature("4/4");
+    const voice = system.getVoices()[1];
+    factory.TextBracket({
+      from: voice.getTickables()[1],
+      to: voice.getTickables()[2],
+      text: 'halb',
+      options: {
+        // superscript: 'va',
+        position: 'bottom',
+      },
+    }).setLine(2);
+
+    factory.TextBracket({
+      from: voice.getTickables()[4],
+      to: voice.getTickables()[5],
+      text: 'halb',
+      options: {
+        // superscript: 'va',
+        position: 'bottom',
+      },
+    }).setLine(2);
+
+  }`} />
+
+In Strudel erhaltet Ihr C-Moll mit `.scale("c:minor")`:
+
+<MiniRepl name='c_minor' tune={`n("0 1 2 3 4 5 6 7").scale("c:minor").s("piano")`}/>
+
+## Melodisches Moll
+
+Im melodischen Moll wird der zweite Halbton dahin geschoben, wo er im Dur liegt.
+Das ist manchmal wünschenswert, weil man bei einer aufsteigenden Tonleiter
+direkt vor dem erreichen der Oktave nur noch einen kleinen Schritt hat.
+
+Die Halbtöne liegen also zwischen dem 2. und 3. Ton und dem 7. und 8. Ton.
+
+Das melodische Moll wird vor allem bei aufwärts-Tonleitern verwendet. Absteigend
+verwendet man das "normale" Moll.
+
+<MiniRepl name='c_minor_melodic' tune={`n(\`0 1 2 3 4 5 6 7
+    8 7 6 5 4 3 2 1\`)
+    .scale("c4:melodic:minor c4:minor").slow(2).s("piano")`}/>
+
+## Harmonisches Moll
+
+Im harmonischen Moll wird die "normale" Molltonleiter auch so verändert, dass
+ein Halbtonschritt zwischen 7. und 8. Note liegt, allerdings wird dafür einfach
+die 7. Note erhöht. Der Halbtonschritt zwischen 5. und 6. Ton bleibt. Dadurch
+wird der Abstand vom 6. zum 7. Ton also größer als ein Ganzton und ist dann eine
+kleine Terz! Harmonisches Moll hat also drei Halbtonschritte und einen kleinen
+Terzschritt.
+
+Harmonisches Moll klingt ziemlich besonders:
+
+<MiniRepl name='c_minor_harmonic' tune={`n(\`0 1 2 3 4 5 6 7
+    8 7 6 5 4 3 2 1\`)
+    .scale("c4:harmonic:minor").slow(2).s("piano")`}/>
+
+## Pentatonik
+
+Der Name kommt vom griechischen "pénte" (Fünf). Hier gibt es innerhalb einer
+Oktave nicht sieben Töne wie bei den bisherigen Tonleitern, sondern nur fünf.
+Es gibt Dur-Pentatonik und Moll-Pentatonik. Dazu werden bei den Tonleitern bei
+den Halbtonschritten immer die ersten Töne weggelassen.
+
+Die Abstände sind dann so wie die schwarzen Tasten beim Klavier. (Dur-Pentatonik
+würde beim C♯ anfangen und Moll-Pentatonik beim A♯.)
+
+Da die Tonleitern keine Halbtöne enthalten, klingen sie auch bei kleinen Fehlern
+weniger dissonant. Die Pentatonik spielt eine wichtige Rolle in der
+Waldorf-Pädagogik in den ersten Schuljahren. Typische pentatonische Instrumente
+sind Choroi-Flöte und Kinderharfe.
+
+In Strudel heißen die Tonleitern `major:pentatonic` (kurz nur `pentatonic`) und
+`minor:pentatonic`.
+
+<MiniRepl name='c_major_pentatonic' tune={`n(\`0 1 2 3 4 5 6 7
+    8 7 6 5 4 3 2 1\`)
+    .scale("c4:major:pentatonic").slow(2).s("piano")`}/>
+
+## Going crazy
+
+Es gibt in Strudel noch etliche Tonleitern, insgesamt **85**! In der folgenden Datei
+findet Ihr sie alle. Wenn Ihr welche verwenden wollt, die Leerzeichen im Namen
+haben, ersetzt sie einfach durch Doppelpunkte!
+
+<LinkCard title="Strudel-Tonleitern"
+description="Alle Strudel-Tonleitern auf einen Blick"
+href="https://github.com/tonaljs/tonal/blob/main/packages/scale-type/data.ts"/>
+
+Da gibt es auch noch weitere 5-Ton-Tonleitern und 6-Ton-Tonleitern.
+
+Hört Euch mal diese "Kirchentonarten" durch:
+- `dorian`
+- `lydian`
+- `mixolydian`
+- `phrygian`
+- `locrian` (keine Kirchentonart)
+
+<MiniRepl name='c_kirchentonarten' tune={`n(\`0 1 2 3 4 5 6 7
+    8 7 6 5 4 3 2 1\`)
+    .scale("c4:<dorian lydian mixolydian phrygian locrian>").slow(2).s("piano")`}/>
+
+Schauen wir uns als nächstes an, wie Strudel es leicht macht abwechslungsreiche
+Musik zu machen:
+
+<LinkButton icon='right-arrow' href="../../guides/randomness/">Zufälligkeiten</LinkButton>

@@ -1,0 +1,68 @@
+---
+title: Zufälligkeiten
+description: Zufällige Vorgänge machen die Musik interessant
+---
+import VexFlow from "../../../components/VexFlow.astro";
+import { LinkCard, LinkButton } from "@astrojs/starlight/components";
+import MiniRepl from "../../../components/MiniRepl.astro";
+
+Strudel kann mithilfe sogenannter Pseudo-Zufallszahlen (fast) unvorhersagbare
+Variationen machen.
+
+:::tip[Frage]{icon=comment}
+Zu Pseudo-Zufallszahlen könnte man einen Exkurs machen. Wen interessiert das
+genauer? Ihr könntet auch ein Kurzreferat dazu machen!?
+:::
+
+## Zufällige Melodien
+
+Strudel hat für die Muster zwei Symbole, die zufällige Entscheidungen bieten.
+
+Mit dem `|` kann man zufällige Alternativen schreiben, z.B.:
+
+<MiniRepl name='random_alternatives' tune={`$:n("[0 2 4 7] | [1 3 5 7] | [0 5 0 4]").fast(2)
+.scale("[c4|f#4|g3]:minor").s("piano")._pianoroll()`}/>
+
+Und mit `?` kann man Elemente zufällig weglassen. Sie werden dann durch eine
+Pause `~` ersetzt:
+
+<MiniRepl name='random_skipping' tune={`s("bd sd bd sd, hh*8?")`}/>
+
+Standardmäßig werden die Hälfte der Elemente weggelassen (50% = 0,5). Man kann
+auch andere Häufigkeiten angeben:
+
+<MiniRepl name='random_skipping_rare' tune={`s("bd sd bd sd, hh*8?0.1")`}/>
+
+## Zufällige Steuerung
+
+Wir haben noch nicht viele Befehle kennengelernt, mit denen die Ausgabe
+verändert wird, aber `.gain()` haben wir schon verwendet, um die Lautstärke
+einzustellen. Man kann mit den Befehlen
+
+- `sometimes()`
+- `often()`
+- `rarely()`
+- `almostNever()`
+
+andere Befehle hin und wieder anwenden. Beispiel für einen zufälligen, aber
+irgendwie funktionierenden Groove:
+
+<MiniRepl name='random_modifiers' tune={`$: s("hh*16").rarely(x => x.gain(.2))
+s("bd ~!6 sd")`}/>
+
+Man kann auch an Stellen, wo eine Zahl (zwischen 0 und 1) erwartet wird die
+Funktion `rand` verwenden. Hier mit der Funktion `.pan()`, um den Bass zufällig
+zwischen links und rechts hin- und herspringen zu lassen:
+
+<MiniRepl name='random_modifiers' tune={`$hh: s("hh*16").rarely(x => x.gain(.2))
+$bd: s("bd*4").n(7).gain(isaw)
+$bass: n("0!3 [7|5]").fast(2).scale("[<c2!2 f2 g2>]:minor")
+  .s("supersaw").pan(rand)`}/>
+
+:::tip[Frage]{icon=comment}
+Was macht `isaw` hier? Hört genau hin oder sucht in der Strudel-Anleitung nach!
+:::
+
+Probiert es selbst:
+
+<LinkButton icon='right-arrow' href="../../exercises/04_tunes_with_scales_and_randomness/">Übungen: Melodien mit Tonleitern und Zufällen</LinkButton>
