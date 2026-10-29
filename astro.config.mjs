@@ -89,12 +89,12 @@ export default defineConfig({
       enabled: true,
     },
     manifest: {
-      // includeAssets: ['favicon.ico', 'icons/apple-icon-180.png'],
       name: 'Informatik 10-12/2026: Coding Music',
       short_name: 'Informatik 10-12/2026',
       description:
         'Kursmaterial für "Informatik 10-12/2026: Coding Music" an der Freien Waldorfschule Werder',
-      theme_color: '#222222',
+      // keep in sync with <meta name="theme-color"> in KursHead.astro
+      theme_color: '#00807e',
       // rendered from the logo by scripts/render_icons.sh
       icons: [
         {
