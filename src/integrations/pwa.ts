@@ -145,12 +145,17 @@ function manifestTransform(ctx: PWAContext): ManifestTransform {
       }
 
       const parts = url.split("/");
-      parts[parts.length - 1] = parts[parts.length - 1].replace(/\.html$/, "");
-      let newUrl = ctx.directoryFormat
-        ? parts.length > 1
-          ? parts.slice(0, -1).join("/")
-          : parts[0]
-        : parts.join("/");
+      const file = parts.pop()!;
+      let newUrl: string;
+      if (ctx.directoryFormat) {
+        // Astro writes pages as `<route>/index.html`. Any other `.html` file
+        // (e.g. copied from `public/`) is only served under its own name, and
+        // a single 404 in the precache list makes the whole SW install fail.
+        if (file !== "index.html") continue;
+        newUrl = parts.join("/");
+      } else {
+        newUrl = [...parts, file.replace(/\.html$/, "")].join("/");
+      }
       if (ctx.trailingSlash === "always") newUrl += "/";
       extraEntries.push({
         ...entry,
