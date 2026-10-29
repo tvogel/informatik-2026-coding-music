@@ -1,3 +1,14 @@
 :root {
   --sl-content-width: 80rem;
+
+  /* Accent: teal from the Freie Waldorfschule Werder logo (#00aca9) */
+  --sl-color-accent-low: #00403f;
+  --sl-color-accent: #00aca9;
+  --sl-color-accent-high: #33c4c0;
+}
+
+:root[data-theme='light'] {
+  --sl-color-accent-low: #c8ecea;
+  --sl-color-accent: #00807e;
+  --sl-color-accent-high: #00504e;
 }
