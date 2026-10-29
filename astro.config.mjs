@@ -98,32 +98,33 @@ export default defineConfig({
       description:
         'Kursmaterial für "Informatik 10-12/2026: Coding Music" an der Freien Waldorfschule Werder',
       theme_color: '#222222',
-      // icons: [
-      //   {
-      //     src: 'icons/manifest-icon-192.maskable.png',
-      //     sizes: '192x192',
-      //     type: 'image/png',
-      //     purpose: 'any',
-      //   },
-      //   {
-      //     src: 'icons/manifest-icon-192.maskable.png',
-      //     sizes: '192x192',
-      //     type: 'image/png',
-      //     purpose: 'maskable',
-      //   },
-      //   {
-      //     src: 'icons/manifest-icon-512.maskable.png',
-      //     sizes: '512x512',
-      //     type: 'image/png',
-      //     purpose: 'any',
-      //   },
-      //   {
-      //     src: 'icons/manifest-icon-512.maskable.png',
-      //     sizes: '512x512',
-      //     type: 'image/png',
-      //     purpose: 'maskable',
-      //   },
-      // ],
+      // rendered from the logo by scripts/render_icons.sh
+      icons: [
+        {
+          src: 'icons/manifest-icon-192.png',
+          sizes: '192x192',
+          type: 'image/png',
+          purpose: 'any',
+        },
+        {
+          src: 'icons/manifest-icon-192.maskable.png',
+          sizes: '192x192',
+          type: 'image/png',
+          purpose: 'maskable',
+        },
+        {
+          src: 'icons/manifest-icon-512.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'any',
+        },
+        {
+          src: 'icons/manifest-icon-512.maskable.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'maskable',
+        },
+      ],
     },
   })],
 });
