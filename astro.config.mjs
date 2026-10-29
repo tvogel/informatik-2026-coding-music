@@ -19,6 +19,10 @@ export default defineConfig({
       }
     },
     title: 'Informatik 10-12/2026: Coding Music',
+    logo: {
+      light: './src/assets/logo-light.svg',
+      dark: './src/assets/logo-dark.svg',
+    },
     social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
     sidebar: [
       {
