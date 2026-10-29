@@ -2,8 +2,11 @@
 
 Usage:
     python3 scripts/gen_logo.py light > src/assets/logo-light.svg
-    python3 scripts/gen_logo.py dark > src/assets/logo-dark.svg
+    python3 scripts/gen_logo.py inline > src/assets/logo-inline.svg
     python3 scripts/gen_logo.py auto > public/favicon.svg
+
+"inline" is embedded into every page by src/components/SiteTitle.astro, which
+colors the `logo-stem` elements per Starlight theme.
 """
 import math
 import sys
@@ -43,7 +46,11 @@ if mode == "auto":
     body = logo("STEM").replace('fill="STEM"', 'class="stem"')
     style = (f"<style>.stem{{fill:{DARK}}}"
              f"@media (prefers-color-scheme:dark){{.stem{{fill:{GREEN}}}}}</style>")
+elif mode == "inline":
+    # no <style> here: inside an inline SVG it would apply to the whole page
+    body = logo("STEM").replace('fill="STEM"', 'class="logo-stem"')
+    style = ""
 else:
-    body = logo(DARK if mode == "light" else GREEN)
+    body = logo(DARK)
     style = ""
 print(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">{style}\n  {body}\n</svg>')

@@ -1,0 +1,42 @@
+---
+// Starlight's SiteTitle with the logo inlined: as <img> it had to be fetched on
+// every page navigation and blinked briefly in the header.
+import Logo from '../assets/logo-inline.svg';
+
+const { siteTitle, siteTitleHref } = Astro.locals.starlightRoute;
+---
+
+<a href={siteTitleHref} class="site-title sl-flex">
+  <Logo class="site-title-logo" aria-hidden="true" />
+  <span translate="no">{siteTitle}</span>
+</a>
+
+<style>
+  @layer starlight.core {
+    .site-title {
+      align-items: center;
+      gap: var(--sl-nav-gap);
+      font-size: var(--sl-text-h4);
+      font-weight: 600;
+      color: var(--sl-color-text-accent);
+      text-decoration: none;
+      white-space: nowrap;
+      min-width: 0;
+    }
+    span {
+      overflow: hidden;
+    }
+    .site-title :global(.site-title-logo) {
+      flex-shrink: 0;
+      height: calc(var(--sl-nav-height) - 2 * var(--sl-nav-pad-y));
+      width: auto;
+    }
+    /* Stems and beam: lighter green on the dark theme (Starlight's default) */
+    .site-title :global(.logo-stem) {
+      fill: #13a538;
+    }
+    :global(:root[data-theme='light']) .site-title :global(.logo-stem) {
+      fill: #00712f;
+    }
+  }
+</style>
