@@ -1,0 +1,31 @@
+diff --git a/dist/index-1NNF4L0p.js b/dist/index-1NNF4L0p.js
+index dded4abb4ba009933974c0fcdf16d4bb238825c2..09fdd71f68579e210636c86cd3e9c416a5e60388 100644
+--- a/dist/index-1NNF4L0p.js
++++ b/dist/index-1NNF4L0p.js
+@@ -46792,7 +46792,10 @@ if (typeof HTMLElement < "u") {
+       const n = document.createElement("div");
+       this.parentElement.insertBefore(n, this.nextSibling);
+       const s = ma(), r = [-2, 2];
++      t.instanceCount = (t.instanceCount ?? 0) + 1;
++      const editorId = this.getAttribute("id") || `strudel_editor_${t.instanceCount}`;
+       this.editor = new zR({
++        id: editorId,
+         defaultOutput: O0,
+         getTime: () => st().currentTime,
+         transpiler: bV,
+diff --git a/repl-component.mjs b/repl-component.mjs
+index cb79a47551932a5e59ed219109b012d77ed1389e..5b743c5ac3e406545fcf7af9107b9142794f383c 100644
+--- a/repl-component.mjs
++++ b/repl-component.mjs
+@@ -36,7 +36,11 @@ if (typeof HTMLElement !== 'undefined') {
+       this.parentElement.insertBefore(container, this.nextSibling);
+       const drawContext = getDrawContext();
+       const drawTime = [-2, 2];
++      // unique id per editor, so inline widgets (_pianoroll etc.) of different editors get distinct DOM ids
++      StrudelRepl.instanceCount = (StrudelRepl.instanceCount ?? 0) + 1;
++      const id = this.getAttribute('id') || `strudel_editor_${StrudelRepl.instanceCount}`;
+       this.editor = new StrudelMirror({
++        id,
+         defaultOutput: webaudioOutput,
+         getTime: () => getAudioContext().currentTime,
+         transpiler,

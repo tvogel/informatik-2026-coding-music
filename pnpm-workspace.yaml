@@ -3,3 +3,5 @@ allowBuilds:
   sharp: true
 minimumReleaseAgeExclude:
   - '@astrojs/starlight@0.42.2'
+patchedDependencies:
+  '@strudel/repl': patches/@strudel__repl.patch
