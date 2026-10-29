@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+  <body>
+    <script src="https://unpkg.com/@strudel/repl@1.3.0"></script>
+    First REPL:
+    <div id="strudel"></div>
+    Second REPL:
+    <div id="strudel2"></div>
+    <script>
+      const repl = document.createElement("strudel-editor");
+      repl.setAttribute(
+        "code",
+        `setcpm(135/4)
+  $: s(\`bd ~  bd ~,
+        ~  sd  ~  sd\`)
+     ._pianoroll({labels: true}).n(4);
+  $: s(\`[~ hh:1]*4,
+        ~  ~  ~  [~ <clap [clap/2 clap]>]\`)
+     ._pianoroll();
+  _$: s("hh:1!14 clap ~")
+     ._pianoroll();`,
+      );
+      document.getElementById("strudel").append(repl);
+      console.log(repl.editor);
+
+      const repl2 = document.createElement("strudel-editor");
+      repl2.setAttribute(
+        "code",
+        `setcpm(135/4)
+  $: s(\`bd ~  bd ~,
+        ~  sd  ~  sd\`)
+     ._pianoroll({labels: true}).n(4);
+  $: s(\`[~ hh:1]*4,
+        ~  ~  ~  [~ <clap [clap/2 clap]>]\`)
+     ._pianoroll();
+  _$: s("hh:1!14 clap ~")
+     ._pianoroll();`,
+      );
+      document.getElementById("strudel2").append(repl2);
+      console.log(repl2.editor);
+    </script>
+  </body>
+</html>
