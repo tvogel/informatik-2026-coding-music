@@ -33,6 +33,10 @@ jobs:
         id: pages
         uses: actions/configure-pages@v6
 
+      # builds on its own and checks the PWA in the runner's Google Chrome
+      - name: Test PWA
+        run: pnpm test
+
       - name: Build site
         run: |
           pnpm build \
