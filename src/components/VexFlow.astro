@@ -38,6 +38,16 @@ const id = crypto.randomUUID();
           tickable.getBeam()?.setStyle(fgStyle);
       });
     });
+    (factory as any).renderQ.forEach((element: VexFlow.Element) => {
+      if ("setGroupStyle" in element) {
+        element.setGroupStyle(fgStyle);
+      }
+      if ("renderOptions" in element) {
+        const renderOptions = element.renderOptions as any;
+        if ("color" in renderOptions /* && renderOptions.color === "black" */)
+          renderOptions.color = fgColor;
+      }
+    });
   }
 
   function commitHook(obj: any, note: any, builder: any) {
