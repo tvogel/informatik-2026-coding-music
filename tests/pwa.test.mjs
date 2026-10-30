@@ -78,6 +78,12 @@ describe("build output", () => {
     assert.equal(meta?.toLowerCase(), m.theme_color.toLowerCase());
   });
 
+  test("manifest language matches the pages", async () => {
+    const m = await readJson(path.join(dist, "manifest.webmanifest"));
+    const html = await readFile(path.join(dist, "index.html"), "utf8");
+    assert.equal(m.lang, html.match(/<html lang="([^"]*)"/)?.[1]);
+  });
+
   test("every page links the manifest and the Apple touch icon", async () => {
     const pages = (await readdir(dist, { recursive: true })).filter(
       (f) => f === "index.html" || f.endsWith(`${path.sep}index.html`),
