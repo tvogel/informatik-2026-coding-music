@@ -1,8 +1,19 @@
 diff --git a/dist/index-1NNF4L0p.js b/dist/index-1NNF4L0p.js
-index dded4abb4ba009933974c0fcdf16d4bb238825c2..09fdd71f68579e210636c86cd3e9c416a5e60388 100644
+index dded4abb4ba009933974c0fcdf16d4bb238825c2..d6b65948ba77497a79d9c5d30ef68972d0b072a3 100644
 --- a/dist/index-1NNF4L0p.js
 +++ b/dist/index-1NNF4L0p.js
-@@ -46792,7 +46792,10 @@ if (typeof HTMLElement < "u") {
+@@ -6787,7 +6787,9 @@ function iD(t) {
+   Wi[t] !== void 0 && (cancelAnimationFrame(Wi[t]), delete Wi[t]);
+ }
+ function E6(t) {
+-  Object.keys(Wi).forEach((e) => (!t || e.startsWith(t)) && iD(e));
++  // Only this editor and its widgets (`${id}_widget_...`): a bare prefix
++  // match made `strudel_editor_1` cancel the draws of `strudel_editor_12`.
++  Object.keys(Wi).forEach((e) => (!t || e === t || e.startsWith(t + "_")) && iD(e));
+ }
+ let sa = {};
+ fe.prototype.draw = function(t, e) {
+@@ -46792,7 +46794,10 @@ if (typeof HTMLElement < "u") {
        const n = document.createElement("div");
        this.parentElement.insertBefore(n, this.nextSibling);
        const s = ma(), r = [-2, 2];
