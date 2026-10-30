@@ -2,8 +2,8 @@
 // is installable, works offline and picks up a new deployment by itself.
 //
 // Run with `pnpm test`. Needs Google Chrome (or set CHROME_PATH). To skip the
-// build and test an existing one, set PWA_TEST_DIST to its output directory
-// (built with the same --base as below).
+// build and test an existing one (as CI does with what it deploys), set
+// PWA_TEST_DIST to its output directory.
 import { after, before, describe, test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
@@ -13,7 +13,9 @@ import http from "node:http";
 import path from "node:path";
 import { chromium } from "playwright-core";
 
-const BASE = "/informatik-2026-coding-music/";
+// base path of our own build, as on GitHub Pages; for PWA_TEST_DIST it is
+// taken from the manifest
+let BASE = "/informatik-2026-coding-music/";
 // a page that is precached, but not the start page
 const PAGE = "guides/welcome/";
 
@@ -31,6 +33,8 @@ before(async () => {
     execFileSync("pnpm", ["astro", "build", "--base", BASE, "--outDir", dist], {
       stdio: ["ignore", "ignore", "inherit"],
     });
+  } else {
+    BASE = (await readJson(path.join(dist, "manifest.webmanifest"))).scope;
   }
 });
 
@@ -57,7 +61,7 @@ describe("build output", () => {
   test("manifest describes an installable app", async () => {
     const m = await readJson(path.join(dist, "manifest.webmanifest"));
     assert.ok(m.name && m.short_name);
-    assert.equal(m.scope, BASE);
+    assert.match(m.scope, /^\/(.+\/)?$/);
     assert.ok(m.start_url.startsWith(BASE), `start_url ${m.start_url} outside scope`);
     assert.ok(["standalone", "fullscreen", "minimal-ui"].includes(m.display));
 
