@@ -59,6 +59,7 @@ const hasDefaultTune = tune.trim().length > 0;
             </div>
           </div>
           <div data-target="strudel" />
+          <p class="error" data-target="error" aria-live="polite" hidden />
         </div>
       )
     }
@@ -124,11 +125,40 @@ const hasDefaultTune = tune.trim().length > 0;
       repl.setAttribute("code", initialTune);
       strudel.append(repl);
 
+      const error = $("error");
+      const showError = (message?: string) => {
+        error.textContent = message ? `Fehler: ${message}` : "";
+        error.hidden = !message;
+      };
+      let started = false;
       repl.addEventListener("update", ((event: Event) => {
-        const detail = (event as CustomEvent<{ code?: string }>).detail;
+        const detail = (
+          event as CustomEvent<{
+            code?: string;
+            error?: Error;
+            pending?: boolean;
+            started?: boolean;
+          }>
+        ).detail;
         const code = detail.code ?? "";
         strudel.dataset.tune = code;
         writeLocalStorage(storageKey, code);
+        started = detail.started ?? started;
+        // a new evaluation starts with a clean slate
+        if (detail.pending) showError();
+        else if (detail.error) showError(detail.error.message);
+      }) as EventListener);
+      // Errors while playing (e.g. an unknown sound) are only logged globally.
+      // With solo, only the started editor plays, so they belong to it.
+      // Evaluation errors arrive per editor via "update" above.
+      document.addEventListener("strudel.log", ((event: Event) => {
+        const { message, type } = (
+          event as CustomEvent<{ message: string; type?: string }>
+        ).detail;
+        const match = message.match(/^\[(\w+)\] error: (.*)$/s);
+        if (!started || match?.[1] === "eval") return;
+        if (match) showError(match[2]);
+        else if (type === "error") showError(message);
       }) as EventListener);
 
       const triggerHistoryAction = (
@@ -250,6 +280,19 @@ const hasDefaultTune = tune.trim().length > 0;
     font-size: 1rem;
   }
 
+  .error {
+    margin: 0.5rem 0 0;
+    padding: 0.25rem 0.5rem;
+    border-inline-start: 0.25rem solid var(--sl-color-red);
+    background-color: var(--sl-color-red-low);
+    color: var(--sl-color-red-high);
+    font-family: var(--__sl-font-mono);
+    font-size: var(--sl-text-sm);
+    white-space: pre-wrap;
+  }
+  .error[hidden] {
+    display: none;
+  }
   .code-pane {
     position: relative;
     min-height: 0;
