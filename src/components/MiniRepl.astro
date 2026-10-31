@@ -2,20 +2,31 @@
 interface Props {
   name?: string;
   tune?: string;
-  displayOnly?: boolean;
+  /**
+   * - `full`: editable, with undo/redo and the original tune next to it
+   * - `playOnly`: only plays `tune`, with small start/stop buttons
+   * - `displayOnly`: only shows `tune`
+   */
+  mode?: "full" | "playOnly" | "displayOnly";
 }
 
-const { name, tune = "", displayOnly = false } = Astro.props;
+const { name, tune = "", mode = "full" } = Astro.props;
+const displayOnly = mode === "displayOnly";
+const playOnly = mode === "playOnly";
 const hasDefaultTune = tune.trim().length > 0;
 ---
 
 <RootElement>
   <div
-    class="root not-content"
+    class:list={[
+      "root not-content",
+      { "root--play-only": playOnly, "root--display-only": displayOnly },
+    ]}
     data-target="mini-repl"
     data-mini-repl
     data-default-tune={tune}
     data-mini-repl-name={name}
+    data-play-only={playOnly ? "" : undefined}
   >
     {
       !displayOnly && (
@@ -39,32 +50,35 @@ const hasDefaultTune = tune.trim().length > 0;
                 <span aria-hidden="true">■</span>
               </button>
             </div>
-            <div class="controls__group">
-              <button
-                aria-label="Rückgängig"
-                data-target="undo"
-                title="Rückgängig"
-                type="button"
-              >
-                <span aria-hidden="true">↶</span>
-              </button>
-              <button
-                aria-label="Wiederholen"
-                data-target="redo"
-                title="Wiederholen"
-                type="button"
-              >
-                <span aria-hidden="true">↷</span>
-              </button>
-            </div>
+            {!playOnly && (
+              <div class="controls__group">
+                <button
+                  aria-label="Rückgängig"
+                  data-target="undo"
+                  title="Rückgängig"
+                  type="button"
+                >
+                  <span aria-hidden="true">↶</span>
+                </button>
+                <button
+                  aria-label="Wiederholen"
+                  data-target="redo"
+                  title="Wiederholen"
+                  type="button"
+                >
+                  <span aria-hidden="true">↷</span>
+                </button>
+              </div>
+            )}
           </div>
-          <div data-target="strudel" />
+          <div class="editor" data-target="strudel" />
           <p class="error" data-target="error" aria-live="polite" hidden />
         </div>
       )
     }
     {
       hasDefaultTune &&
+        !playOnly &&
         ((!displayOnly && (
           <aside class="code-pane" aria-label="Original tune">
             <button
@@ -90,10 +104,49 @@ const hasDefaultTune = tune.trim().length > 0;
     writeLocalStorage,
   } from "../lib/localStorage";
 
+  /**
+   * Makes a `<strudel-editor>` view-only. Only setting `contenteditable` is
+   * not enough: Chrome's EditContext input bypasses it.
+   *
+   * Strudel bundles its own copy of CodeMirror, so its classes have to be
+   * taken from the live editor instead of being imported. `StateEffect` is
+   * only reachable through one of Strudel's settings compartments
+   * (`state.config` is internal, but Strudel is pinned by our patch).
+   */
+  const lockEditor = (repl: HTMLElement & { editor?: any }) => {
+    let locked = false;
+    const lock = () => {
+      const view = repl.editor?.editor;
+      if (locked || !view) return;
+      locked = true;
+      view.dom.classList.add("is-readonly-view");
+
+      const EditorView = view.constructor;
+      const EditorState = view.state.constructor;
+      const compartment = view.state.config?.compartments?.keys().next().value;
+      const StateEffect = compartment?.reconfigure([]).constructor;
+      if (StateEffect?.appendConfig && EditorState.readOnly && EditorView.editable) {
+        view.dispatch({
+          effects: StateEffect.appendConfig.of([
+            EditorState.readOnly.of(true),
+            EditorView.editable.of(false),
+          ]),
+        });
+      } else {
+        console.warn("MiniRepl: cannot lock editor properly.");
+        view.contentDOM.setAttribute("contenteditable", "false");
+        view.contentDOM.setAttribute("aria-readonly", "true");
+      }
+    };
+    repl.addEventListener("update", lock);
+    queueMicrotask(lock);
+  };
+
   RootElement.ready(async ($) => {
     const root = $("mini-repl");
     const strudel = $.optional("strudel");
     const reference = $.optional("reference");
+    const playOnly = root.dataset.playOnly !== undefined;
 
     const defaultTune = root.dataset.defaultTune ?? "";
     const storageKey = makeStorageKey(
@@ -103,8 +156,10 @@ const hasDefaultTune = tune.trim().length > 0;
       root?.dataset.miniReplName,
     );
 
-    const initialTune =
-      readLocalStorage(storageKey) ?? root.dataset.tune ?? defaultTune;
+    // A play-only tune is never edited, so there is nothing to keep.
+    const initialTune = playOnly
+      ? defaultTune
+      : (readLocalStorage(storageKey) ?? root.dataset.tune ?? defaultTune);
     root.dataset.tune = initialTune;
 
     let repl:
@@ -124,6 +179,7 @@ const hasDefaultTune = tune.trim().length > 0;
 
       repl.setAttribute("code", initialTune);
       strudel.append(repl);
+      if (playOnly) lockEditor(repl);
 
       const error = $("error");
       const showError = (message?: string) => {
@@ -142,7 +198,7 @@ const hasDefaultTune = tune.trim().length > 0;
         ).detail;
         const code = detail.code ?? "";
         strudel.dataset.tune = code;
-        writeLocalStorage(storageKey, code);
+        if (!playOnly) writeLocalStorage(storageKey, code);
         started = detail.started ?? started;
         // a new evaluation starts with a clean slate
         if (detail.pending) showError();
@@ -186,44 +242,21 @@ const hasDefaultTune = tune.trim().length > 0;
         repl!.editor?.stop();
       });
 
-      $("undo").addEventListener("click", () => {
+      $.optional("undo")?.addEventListener("click", () => {
         triggerHistoryAction("historyUndo");
       });
 
-      $("redo").addEventListener("click", () => {
+      $.optional("redo")?.addEventListener("click", () => {
         triggerHistoryAction("historyRedo");
       });
     }
 
     if (reference) {
-      const referenceRepl = document.createElement(
-        "strudel-editor",
-      ) as HTMLElement & {
-        editor?: {
-          editor?: {
-            dispatch: (value: { effects: unknown }) => void;
-          };
-        };
-      };
+      const referenceRepl = document.createElement("strudel-editor");
 
       referenceRepl.setAttribute("code", defaultTune);
       reference.append(referenceRepl);
-
-      const lockReferenceEditor = () => {
-        const referenceEditor = referenceRepl.editor?.editor as any;
-        if (!referenceEditor?.contentDOM) return;
-
-        referenceEditor.contentDOM.setAttribute("contenteditable", "false");
-        referenceEditor.contentDOM.setAttribute("aria-readonly", "true");
-        referenceEditor.dom?.classList.add("is-readonly-view");
-        referenceEditor.dom?.classList.remove("cm-focused");
-      };
-
-      referenceRepl.addEventListener(
-        "update",
-        lockReferenceEditor as EventListener,
-      );
-      queueMicrotask(lockReferenceEditor);
+      lockEditor(referenceRepl);
 
       if (strudel) {
         const reset = $("reset");
@@ -280,6 +313,38 @@ const hasDefaultTune = tune.trim().length > 0;
     font-size: 1rem;
   }
 
+  /* small start/stop buttons in front of the editor, not above it */
+  .root--play-only .editor-pane {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding-top: 0;
+  }
+
+  .root--play-only .controls {
+    position: static;
+  }
+
+  .root--play-only .editor {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .root--play-only .error {
+    flex-basis: 100%;
+    margin-top: 0;
+  }
+
+  .root--play-only .controls button {
+    min-width: 1.75rem;
+    padding: 0.2rem 0.35rem;
+  }
+
+  .root--play-only .controls button span {
+    font-size: 0.75rem;
+  }
+
   .error {
     margin: 0.5rem 0 0;
     padding: 0.25rem 0.5rem;
@@ -319,6 +384,12 @@ const hasDefaultTune = tune.trim().length > 0;
 
     .code-pane {
       grid-column: 2;
+    }
+
+    /* no original tune next to it */
+    .root--play-only,
+    .root--display-only {
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 
