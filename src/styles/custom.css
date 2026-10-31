@@ -12,3 +12,9 @@
   --sl-color-accent: #00807e;
   --sl-color-accent-high: #00504e;
 }
+
+/* Starlight spaces out sibling elements in content, which would also tear
+   apart the parts of a MathML formula (root index, exponents). */
+.sl-markdown-content math * {
+  margin-top: 0;
+}
