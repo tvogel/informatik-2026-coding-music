@@ -55,6 +55,7 @@ export default defineConfig({
     components: {
       Head: './src/components/KursHead.astro',
       SiteTitle: './src/components/SiteTitle.astro',
+      SocialIcons: './src/components/SocialIcons.astro',
     },
     customCss: [
       './src/styles/custom.css',

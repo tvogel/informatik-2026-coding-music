@@ -1,0 +1,143 @@
+---
+/*
+ * Header buttons to save everything the course pages keep in localStorage
+ * (code, answers, checklists, quizzes) to a JSON file and to restore it.
+ * Nothing leaves the browser except as the file the reader downloads.
+ */
+---
+
+<data-backup class="sl-flex">
+  <button type="button" data-backup-export title="Meine Daten als Datei sichern">
+    <span class="sr-only">Meine Daten als Datei sichern</span>
+    <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16">
+      <path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3" />
+    </svg>
+  </button>
+  <button type="button" data-backup-import title="Gesicherte Daten laden">
+    <span class="sr-only">Gesicherte Daten laden</span>
+    <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16">
+      <path d="M12 15V3M7 8l5-5 5 5M4 17v3h16v-3" />
+    </svg>
+  </button>
+  <input type="file" accept="application/json,.json" hidden />
+</data-backup>
+
+<script>
+  import { readLocalStorage, writeLocalStorage } from "../lib/localStorage";
+
+  /** Key prefixes of the data the course pages store; keep in sync. */
+  const PREFIXES = ["mini-repl:", "answer:", "checklist:", "starlight-quiz:"];
+  const FORMAT = "informatik-kurs-daten";
+  const VERSION = 1;
+
+  const isCourseKey = (key: string) =>
+    PREFIXES.some((prefix) => key.startsWith(prefix));
+
+  function collect(): Record<string, string> {
+    const data: Record<string, string> = {};
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && isCourseKey(key)) data[key] = readLocalStorage(key) ?? "";
+      }
+    } catch {}
+    return data;
+  }
+
+  function exportData() {
+    const data = collect();
+    const json = JSON.stringify(
+      { format: FORMAT, version: VERSION, saved: new Date().toISOString(), data },
+      null,
+      2,
+    );
+    const url = URL.createObjectURL(
+      new Blob([json], { type: "application/json" }),
+    );
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `informatik-kurs-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function importData(file: File) {
+    let data: Record<string, unknown>;
+    try {
+      const backup = JSON.parse(await file.text());
+      if (backup?.format !== FORMAT || typeof backup.data !== "object") {
+        throw new Error();
+      }
+      data = backup.data;
+    } catch {
+      alert("Diese Datei ist keine Datensicherung aus diesem Kurs.");
+      return;
+    }
+
+    const entries = Object.entries(data).filter(
+      (entry): entry is [string, string] =>
+        isCourseKey(entry[0]) && typeof entry[1] === "string",
+    );
+    if (
+      !confirm(
+        `${entries.length} Einträge laden? Gleichnamige Daten in diesem ` +
+          "Browser werden dabei überschrieben.",
+      )
+    ) {
+      return;
+    }
+    entries.forEach(([key, value]) => writeLocalStorage(key, value));
+    // The components read their data only on page load.
+    location.reload();
+  }
+
+  class DataBackup extends HTMLElement {
+    connectedCallback() {
+      const input = this.querySelector("input")!;
+      this.querySelector("[data-backup-export]")!.addEventListener(
+        "click",
+        exportData,
+      );
+      this.querySelector("[data-backup-import]")!.addEventListener("click", () =>
+        input.click(),
+      );
+      input.addEventListener("change", () => {
+        const file = input.files?.[0];
+        input.value = "";
+        if (file) importData(file);
+      });
+    }
+  }
+  customElements.define("data-backup", DataBackup);
+</script>
+
+<style>
+  data-backup {
+    gap: 1rem;
+    align-items: center;
+  }
+
+  button {
+    display: flex;
+    padding: 0.5em;
+    margin: -0.5em;
+    border: none;
+    background: none;
+    color: var(--sl-color-text-accent);
+    cursor: pointer;
+  }
+
+  button:hover {
+    color: var(--sl-color-white);
+  }
+
+  svg {
+    width: 1.25em;
+    height: 1.25em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+</style>
