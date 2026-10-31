@@ -34,14 +34,16 @@
     PREFIXES.some((prefix) => key.startsWith(prefix));
 
   function collect(): Record<string, string> {
-    const data: Record<string, string> = {};
+    const keys: string[] = [];
     try {
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && isCourseKey(key)) data[key] = readLocalStorage(key) ?? "";
+        if (key && isCourseKey(key)) keys.push(key);
       }
     } catch {}
-    return data;
+    // Sorted to make the file easy to read and compare: by kind, then page.
+    keys.sort();
+    return Object.fromEntries(keys.map((key) => [key, readLocalStorage(key) ?? ""]));
   }
 
   function exportData() {
