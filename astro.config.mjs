@@ -24,7 +24,7 @@ export default defineConfig({
       }
     },
     title: 'Informatik 10-12/2026: Coding Music',
-    social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
+    social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/tvogel/informatik-2026-coding-music' }],
     sidebar: [
       {
         label: 'Kurs',
