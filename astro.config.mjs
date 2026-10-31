@@ -11,6 +11,11 @@ import mdx from '@astrojs/mdx';
 // https://astro.build/config
 export default defineConfig({
   trailingSlash: 'always',
+  // The dev server sends pages without any cache headers, so Firefox may
+  // reuse a stale page (e.g. an outdated sidebar) from its HTTP cache.
+  server: ({ command }) => ({
+    headers: command === 'dev' ? { 'Cache-Control': 'no-store' } : {},
+  }),
   integrations: [starlight({
     locales: {
       root: {
