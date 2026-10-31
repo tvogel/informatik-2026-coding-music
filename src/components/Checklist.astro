@@ -1,14 +1,28 @@
 ---
 interface Props {
   name?: string;
+  /** Lets readers add their own items; the value is the input placeholder. */
+  addable?: string | boolean;
 }
 
-const { name } = Astro.props;
+const { name, addable } = Astro.props;
+const placeholder =
+  typeof addable === "string" && addable.trim() ? addable : "Eigener Eintrag …";
 ---
 
 <RootElement>
   <div data-target="root" data-checklist data-checklist-name={name}>
     <slot />
+    {
+      addable && (
+        <form data-checklist-add hidden>
+          <input type="text" placeholder={placeholder} aria-label={placeholder} />
+          <button type="submit" aria-label="Hinzufügen" title="Hinzufügen">
+            +
+          </button>
+        </form>
+      )
+    }
   </div>
 </RootElement>
 
@@ -18,6 +32,8 @@ const { name } = Astro.props;
     readLocalStorage,
     writeLocalStorage,
   } from "../lib/localStorage";
+
+  type CustomItem = { text: string; checked: boolean };
 
   RootElement.ready(($) => {
     const root = $<HTMLDivElement>("root");
@@ -47,6 +63,74 @@ const { name } = Astro.props;
           writeLocalStorage(storageKey, String(checkbox.checked));
         });
       });
+
+    const form = root.querySelector<HTMLFormElement>("[data-checklist-add]");
+    if (!form) return;
+
+    // The reader's own items live in one entry, separate from the given ones.
+    const customKey = `${listKey}:+`;
+    let customItems: CustomItem[] = [];
+    try {
+      const stored = JSON.parse(readLocalStorage(customKey) ?? "[]");
+      if (Array.isArray(stored)) customItems = stored;
+    } catch {}
+    const saveCustomItems = () =>
+      writeLocalStorage(customKey, JSON.stringify(customItems));
+
+    const list =
+      root.querySelector<HTMLUListElement>("ul.contains-task-list") ??
+      document.createElement("ul");
+    if (!list.isConnected) {
+      list.className = "contains-task-list";
+      form.before(list);
+    }
+
+    const renderCustomItems = () => {
+      list.querySelectorAll("[data-checklist-custom]").forEach((li) => li.remove());
+      customItems.forEach((customItem, index) => {
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = customItem.checked;
+        checkbox.addEventListener("change", () => {
+          customItem.checked = checkbox.checked;
+          saveCustomItems();
+        });
+
+        const label = document.createElement("label");
+        label.append(checkbox, ` ${customItem.text}`);
+
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.textContent = "✕";
+        remove.title = remove.ariaLabel = `„${customItem.text}“ entfernen`;
+        remove.addEventListener("click", () => {
+          customItems.splice(index, 1);
+          saveCustomItems();
+          renderCustomItems();
+        });
+
+        const li = document.createElement("li");
+        li.className = "task-list-item";
+        li.dataset.checklistCustom = "";
+        li.append(label, remove);
+        list.append(li);
+      });
+    };
+
+    const input = form.querySelector("input")!;
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      customItems.push({ text, checked: false });
+      saveCustomItems();
+      renderCustomItems();
+      input.value = "";
+      input.focus();
+    });
+
+    renderCustomItems();
+    form.hidden = false;
   });
 </script>
 
@@ -61,6 +145,51 @@ const { name } = Astro.props;
 
   [data-checklist] :global(label),
   [data-checklist] :global(label input) {
+    cursor: pointer;
+  }
+
+  [data-checklist] :global([data-checklist-custom] button) {
+    /* Starlight spaces out siblings in content; this one belongs inline. */
+    margin-block: 0;
+    margin-inline-start: 0.5rem;
+    padding: 0 0.3rem;
+    border: none;
+    background: none;
+    color: var(--sl-color-gray-3);
+    cursor: pointer;
+  }
+
+  [data-checklist] :global([data-checklist-custom] button:hover) {
+    color: var(--sl-color-red);
+  }
+
+  form {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    max-width: 30rem;
+  }
+
+  form[hidden] {
+    display: none;
+  }
+
+  form input {
+    flex: 1;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--sl-color-gray-4);
+    border-radius: 4px;
+    background: var(--sl-color-bg);
+    color: var(--sl-color-text);
+  }
+
+  form button {
+    margin-block: 0;
+    padding: 0 0.75rem;
+    border: 1px solid var(--sl-color-gray-4);
+    border-radius: 4px;
+    background: var(--sl-color-gray-6);
+    color: var(--sl-color-text);
     cursor: pointer;
   }
 </style>
