@@ -1,0 +1,66 @@
+---
+interface Props {
+  name?: string;
+}
+
+const { name } = Astro.props;
+---
+
+<RootElement>
+  <div data-target="root" data-checklist data-checklist-name={name}>
+    <slot />
+  </div>
+</RootElement>
+
+<script>
+  import {
+    makeStorageKey,
+    readLocalStorage,
+    writeLocalStorage,
+  } from "../lib/localStorage";
+
+  RootElement.ready(($) => {
+    const root = $<HTMLDivElement>("root");
+    const listKey = makeStorageKey(
+      "checklist",
+      root,
+      "[data-checklist]",
+      root?.dataset.checklistName,
+    );
+
+    root
+      .querySelectorAll<HTMLInputElement>("li > input[type=checkbox]")
+      .forEach((checkbox) => {
+        const item = checkbox.parentElement!;
+        // Keyed by the item text, so inserting or reordering items keeps the
+        // other checkmarks.
+        const storageKey = `${listKey}:${item.textContent?.trim()}`;
+
+        // Wrap the item in a label so clicking the text toggles it, too.
+        const label = document.createElement("label");
+        label.append(...item.childNodes);
+        item.append(label);
+
+        checkbox.disabled = false;
+        checkbox.checked = readLocalStorage(storageKey) === "true";
+        checkbox.addEventListener("change", () => {
+          writeLocalStorage(storageKey, String(checkbox.checked));
+        });
+      });
+  });
+</script>
+
+<style>
+  [data-checklist] :global(ul.contains-task-list) {
+    padding-inline-start: 0;
+  }
+
+  [data-checklist] :global(li.task-list-item) {
+    list-style: none;
+  }
+
+  [data-checklist] :global(label),
+  [data-checklist] :global(label input) {
+    cursor: pointer;
+  }
+</style>
