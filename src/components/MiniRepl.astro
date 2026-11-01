@@ -105,6 +105,24 @@ const hasDefaultTune = tune.trim().length > 0;
   } from "../lib/localStorage";
 
   /**
+   * Stopping Strudel only stops scheduling: notes already playing ring out,
+   * which takes a while with long notes (e.g. `.slow(4)`). Resetting
+   * superdough's output cuts them off; new notes reconnect on their own.
+   * With `fade`, the output fades out first to avoid a click.
+   */
+  const silence = (fade: boolean, stillSilent = () => true) => {
+    const controller = (globalThis as any).getSuperdoughAudioController?.();
+    if (!controller) return;
+    if (!fade) return controller.reset();
+    const { audioContext, output } = controller;
+    output.destinationGain?.gain.setTargetAtTime(0, audioContext.currentTime, 0.01);
+    setTimeout(() => {
+      if (stillSilent()) controller.reset();
+      else output.destinationGain?.gain.setTargetAtTime(1, audioContext.currentTime, 0.01);
+    }, 60);
+  };
+
+  /**
    * Makes a `<strudel-editor>` view-only. Only setting `contenteditable` is
    * not enough: Chrome's EditContext input bypasses it.
    *
@@ -235,11 +253,14 @@ const hasDefaultTune = tune.trim().length > 0;
       };
 
       $("start").addEventListener("click", () => {
+        // also cuts notes still ringing from another editor
+        silence(false);
         repl!.editor?.evaluate();
       });
 
       $("stop").addEventListener("click", () => {
         repl!.editor?.stop();
+        silence(true, () => !started);
       });
 
       $.optional("undo")?.addEventListener("click", () => {
