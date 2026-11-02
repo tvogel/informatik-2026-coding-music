@@ -123,6 +123,41 @@ const hasDefaultTune = tune.trim().length > 0;
   };
 
   /**
+   * Strudel loads samples only when they are first played, and drops every
+   * note whose sample is not decoded in time, which typically hits the first
+   * notes after a page load. The scheduler awaits `beforeStart` before it
+   * starts its clock, so loading the samples of the first cycles there delays
+   * the start instead. superdough's sampler is exposed globally by Strudel.
+   */
+  const PRELOAD_CYCLES = 4;
+  const preloadSamples = async (scheduler: { pattern?: any; cps: number }) => {
+    const { getSound, getSampleBuffer } = globalThis as any;
+    if (!scheduler.pattern || !getSound || !getSampleBuffer) return;
+    const loads: Promise<unknown>[] = [];
+    try {
+      const haps = scheduler.pattern.queryArc(0, PRELOAD_CYCLES, {
+        _cps: scheduler.cps,
+      });
+      for (const hap of haps) {
+        if (!hap.hasOnset() || typeof hap.value !== "object") continue;
+        // superdough prefixes the bank the same way
+        const { bank, s } = hap.value;
+        const name = bank && s ? `${bank}_${s}` : s;
+        const sound = typeof name === "string" && getSound(name);
+        if (sound?.data?.type !== "sample") continue;
+        loads.push(
+          getSampleBuffer({ ...hap.value, s: name }, sound.data.samples).catch(
+            () => {},
+          ),
+        );
+      }
+    } catch {
+      // errors in the pattern are reported when it plays
+    }
+    await Promise.all(loads);
+  };
+
+  /**
    * Makes a `<strudel-editor>` view-only. Only setting `contenteditable` is
    * not enough: Chrome's EditContext input bypasses it.
    *
@@ -198,6 +233,8 @@ const hasDefaultTune = tune.trim().length > 0;
       repl.setAttribute("code", initialTune);
       strudel.append(repl);
       if (playOnly) lockEditor(repl);
+      const scheduler = (repl.editor as any)?.repl?.scheduler;
+      if (scheduler) scheduler.beforeStart = () => preloadSamples(scheduler);
 
       const error = $("error");
       const showError = (message?: string) => {
