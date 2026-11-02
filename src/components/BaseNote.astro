@@ -1,0 +1,115 @@
+---
+/*
+ * Wraps content with MiniRepl editors and adds an input for their base
+ * note. The editors' code has to name the default note in quotes, e.g.
+ * `getFreq('a4')` or `scale("a4:chromatic")`; changing the input replaces
+ * it there and re-evaluates a playing editor.
+ */
+interface Props {
+  default?: string;
+  label?: string;
+}
+
+const { default: base = "a4", label = "Grundton" } = Astro.props;
+---
+
+<base-note data-default={base}>
+  <div class="controls not-content">
+    <label>
+      {label}:
+      <input
+        type="text"
+        value={base}
+        size="4"
+        spellcheck="false"
+        autocomplete="off"
+        title="Notenname mit Oktave, z. B. a4, c3 oder f#4"
+      />
+    </label>
+    <output></output>
+  </div>
+  <slot />
+</base-note>
+
+<script>
+  const NOTE = /^([a-g])(#|b)?(\d)$/;
+  const OFFSETS: Record<string, number> = { c: 0, d: 2, e: 4, f: 5, g: 7, a: 9, b: 11 };
+
+  /** Equal-tempered frequency of a note name like "f#4", based on a4 = 440 Hz. */
+  const frequency = (note: string) => {
+    const match = note.match(NOTE);
+    if (!match) return undefined;
+    const [, letter, accidental, octave] = match;
+    const midi =
+      12 * (Number(octave) + 1) +
+      OFFSETS[letter] +
+      (accidental === "#" ? 1 : accidental === "b" ? -1 : 0);
+    return 440 * 2 ** ((midi - 69) / 12);
+  };
+
+  class BaseNote extends HTMLElement {
+    connectedCallback() {
+      const input = this.querySelector("input")!;
+      const output = this.querySelector("output")!;
+      const quoted = new RegExp(`(["'])${this.dataset.default}(?=[:"'])`, "g");
+
+      const apply = () => {
+        const note = input.value.trim().toLowerCase();
+        const hz = frequency(note);
+        input.setAttribute("aria-invalid", String(!hz));
+        if (!hz) {
+          output.textContent = "z. B. a4, c3 oder f#4";
+          return;
+        }
+        output.textContent = `${hz.toLocaleString("de-DE", { maximumFractionDigits: 1 })} Hz`;
+        this.querySelectorAll<HTMLElement & { editor?: any }>("strudel-editor").forEach(
+          (repl) => {
+            repl.dataset.baseTemplate ??= repl.getAttribute("code") ?? "";
+            repl.setAttribute("code", repl.dataset.baseTemplate.replace(quoted, `$1${note}`));
+            if (repl.editor?.repl?.scheduler?.started) repl.editor.evaluate();
+          },
+        );
+      };
+      input.addEventListener("change", apply);
+      apply();
+    }
+  }
+  customElements.define("base-note", BaseNote);
+</script>
+
+<style>
+  base-note {
+    display: block;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: baseline;
+  }
+
+  label {
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+  }
+
+  input {
+    padding: 0.2rem 0.4rem;
+    border: 1px solid var(--sl-color-gray-4);
+    border-radius: 0.25rem;
+    background-color: var(--sl-color-black);
+    color: var(--sl-color-white);
+    font-family: var(--__sl-font-mono);
+  }
+
+  input[aria-invalid="true"] {
+    border-color: var(--sl-color-red);
+  }
+
+  output {
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-sm);
+  }
+</style>
