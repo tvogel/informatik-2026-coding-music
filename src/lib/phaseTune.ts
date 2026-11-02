@@ -9,7 +9,7 @@ export const TRIANGLE_PARTIALS = 15;
  * `phases` only works on waves built from partials: `s("sine")` ignores it,
  * so the sine is built from one partial. Shifting a whole wave by a part of
  * its period shifts its n-th partial by n times that.
- * In stereo, the reference plays on the left and the copy on the right.
+ * In stereo, the copy plays on the left and the reference on the right.
  */
 export function phaseTune(
   wave: Wave,
@@ -26,7 +26,7 @@ export function phaseTune(
         ]
       : [`s("user").partials([1])`, `[${phase}]`];
   return stereo
-    ? `${source}.freq(${freq}).slow(4).pan(0).superimpose(x => x.phases(${phases}).pan(1))`
+    ? `${source}.freq(${freq}).slow(4).pan(1).superimpose(x => x.phases(${phases}).pan(0))`
     : `${source}.freq(${freq}).slow(4).superimpose(x => x.phases(${phases}))`;
 }
 

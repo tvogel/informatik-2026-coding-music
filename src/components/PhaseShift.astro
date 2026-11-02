@@ -1,10 +1,11 @@
 ---
 /*
  * Plots a reference wave (sine or triangle) over two periods together with
- * a copy that can be shifted horizontally (by dragging the plot or with the
- * slider) and the sum of both. A play-only MiniRepl plays the two waves with
- * the chosen shift, mixed (mono) or the reference left and the copy right
- * (stereo).
+ * a copy that can be shifted horizontally (by dragging the plot, with the
+ * arrow and page keys on it or with the slider) and the sum of both. A
+ * play-only MiniRepl plays the two waves with the chosen shift, mixed (mono)
+ * or the copy left and the reference right (stereo): moving the copy to the
+ * right delays it on the left ear, so the sound moves to the right, too.
  */
 import MiniRepl from "./MiniRepl.astro";
 import { phaseTune, type Wave } from "../lib/phaseTune";
@@ -39,11 +40,11 @@ const { wave = "sine", freq = 440, degrees = 90 } = Astro.props;
       Wiedergabe:
       <select name="playback" autocomplete="off">
         <option value="mono">Mono: beide zusammen</option>
-        <option value="stereo">Stereo: Referenz links, verschoben rechts</option>
+        <option value="stereo">Stereo: verschoben links, Referenz rechts</option>
       </select>
     </label>
   </div>
-  <svg class="plot not-content" viewBox="0 0 400 170" role="img">
+  <svg class="plot not-content" viewBox="0 0 400 170" role="img" tabindex="0">
     <line class="grid" x1="0" y1="85" x2="400" y2="85"></line>
     <line class="grid" x1="200" y1="10" x2="200" y2="160"></line>
     <path class="curve curve--reference"></path>
@@ -54,7 +55,7 @@ const { wave = "sine", freq = 440, degrees = 90 } = Astro.props;
   </svg>
   <p class="legend not-content">
     <span class="key key--reference">Referenz</span>
-    <span class="key key--shifted">verschoben (ziehen zum Verschieben)</span>
+    <span class="key key--shifted">verschoben (ziehen, ←/→ oder Bild↑/↓)</span>
     <span class="key key--sum">Summe</span>
     <span class="stereo-note">
       Im Stereo-Modus hört jedes Ohr nur einen der beiden Töne: Die Summe
@@ -162,6 +163,24 @@ const { wave = "sine", freq = 440, degrees = 90 } = Astro.props;
       svg.addEventListener("pointerup", endDrag);
       svg.addEventListener("pointercancel", endDrag);
 
+      // keys on the focused plot; the sound follows once they rest
+      const STEPS: Record<string, number> = {
+        ArrowRight: 5,
+        ArrowLeft: -5,
+        PageUp: 15,
+        PageDown: -15,
+      };
+      let keyTimer: ReturnType<typeof setTimeout> | undefined;
+      svg.addEventListener("keydown", (event) => {
+        const step = STEPS[event.key];
+        if (step === undefined) return;
+        event.preventDefault();
+        degrees = (((degrees + step) % 360) + 360) % 360;
+        draw();
+        clearTimeout(keyTimer);
+        keyTimer = setTimeout(play, 300);
+      });
+
       draw();
     }
   }
@@ -216,6 +235,11 @@ const { wave = "sine", freq = 440, degrees = 90 } = Astro.props;
     /* horizontal drags move the sine, vertical ones still scroll */
     touch-action: pan-y;
     user-select: none;
+  }
+
+  .plot:focus-visible {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 2px;
   }
 
   .grid {
