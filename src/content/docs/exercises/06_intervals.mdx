@@ -1,0 +1,75 @@
+---
+title: "Übungen 6: Melodien mit Intervallen"
+description: Probiert Läufe, alternierende Töne, Sequenzen, Verschiebungen, Rhythmisierung und Swing!
+---
+import { LinkCard, LinkButton } from '@astrojs/starlight/components';
+import MiniRepl from "../../../components/MiniRepl.astro";
+import dedent from "dedent";
+import Checklist from "../../../components/Checklist.astro";
+
+## Intervalle hintereinander
+
+Probiere unterschiedliche Intervalle in Folge, mal wiederholt oder aufeinander aufbauend. Findest Du bekannte Melodien? Was klingt gut für Dich?
+
+### Ideen
+<Checklist name="sequential">
+- [ ] Prim im Wechsel mit verschiedenen Intervallen
+- [ ] Prim, große Terz, Quinte
+- [ ] Prim, kleine Terz, Quinte
+- [ ] Prim, Quart, kleine Sexte
+- [ ] Prim, Quart, große Sexte
+- [ ] Prim, große Terz, kleine Sexte
+- [ ] Prim, kleine Terz, kleine Sexte
+- [ ] mehrere davon hintereinander zimmern, so dass es gut klingt
+</Checklist>
+
+:::tip
+Die Tonleiter `A:chromatic` geht in Halbtönen ab A los. Die Zahlen sind also die Halbtonschritte (siehe Tabelle auf der Kursseite).
+:::
+
+<MiniRepl name='intervals_in_sequence' tune={`
+$: n("7 3 0@2")
+.scale("A:chromatic")
+.sound("gm_xylophone")
+._pianoroll()
+`}/>
+
+## Intervalle zusammen
+
+Diese Abfolgen von Intervallen nennt man auch *gebrochene Akkorde* oder *Arpeggio*. Jetzt spiele sie mal synchron, also Akkorde!
+
+:::tip
+Mehr Spaß macht es mit Rhythmus - erinnere Dich an `struct()` und probiere mal `struct("x ~ x*2 x")` oder was Dir beliebt! Wenn Du mehrere Akkorde hintereinander (pro Takt) spielen willst, denke an `<[x,y,z] [x,y,z]>`!
+Und alles ist besser mit Beats:
+```
+$: s("bd*4, hh*8")
+```
+... oder so
+
+Und probiere auch mal beides in Kombination, mal gebrochene Akkorde, mal "richtige"!
+:::
+
+
+<MiniRepl name='accords' tune={`
+$: n("7,3,0")
+.scale("A:chromatic")
+.sound("gm_xylophone")
+._pianoroll()
+`}/>
+
+{/* setcpm(135/4)
+$: n("<[0,3,7] [0,5,9] [2, 6, 9] [[5, 8, 12] [5, 8, 10]]>")
+  .struct("<[x*2 x x ~]!3 [x x x*2 x]>")
+.scale("A:chromatic")
+.sound("supersaw").adsr(".01:.15:.2:.1").room(0.4).dist(slider(1.029, 0, 1.5), .25)
+._pianoroll()
+$: n("<[0 7]*4 [0 9]*4 [2 9]*4 [[5 8]*2 [5 10]*2]>").scale("A1:chromatic").sound("gm_synth_bass_2").gain(2)
+$: s("bd sd bd sd, hh*16").n(4) */}
+
+Hier geht es bald weiter mit *Harmonien*!
+
+{/* ## Weiter geht es mit *Harmonien*
+
+Das mit den ganzen Intervallen auszuprobieren ist ziemlich mühsam, aber gibt natürlich reichlich Raum für kreative Entdeckungen. Es gibt aber Abfolgen, an die wir ziemlich gewohnt sind und die auch Freude machen zu erkunden:
+
+<LinkButton icon='right-arrow' href="../../guides/harmonies/">Harmonien</LinkButton> */}

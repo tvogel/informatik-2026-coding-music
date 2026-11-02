@@ -1,0 +1,161 @@
+---
+title: Typische Elemente für Melodien
+description: Bausteine für Melodien
+---
+import { LinkCard, LinkButton } from "@astrojs/starlight/components";
+import MiniRepl from "../../../components/MiniRepl.astro";
+
+export const sound = "gm_synth_bass_2";
+
+Es gibt verschiedene Elemente, die man gut in einer Melodie einbauen kann, und die in fast jeder Musik vorkommen. Am besten probiert Ihr sie durch, schaut, was Euch gefällt, verändert die Töne, Reihenfolgen. Und natürlich werden diese ganzen Möglichkeiten in der Musik ständig kombiniert.
+
+## Läufe
+
+Läufe sind Abschnitte der Tonleiter, die man rauf oder runter geht. Wenn man
+Strudels Tonleitern verwendet, braucht man also einfach nur Zahlen nacheinander
+hoch- und runterzählen, wie es einem gefällt:
+
+<MiniRepl name='run' tune={`n(\`0 1 2 1
+2 3 4 5
+4 5 4 5
+4 3 2 1\`)
+.scale("c:major").slow(2).s("${sound}")._pianoroll()`}/>
+
+
+Manchmal werden auch einzelne Töne übersprungen oder an einer anderen Stelle
+neu angesetzt:
+
+<MiniRepl name='run_with_gaps' tune={`n(\`0 1 2 3
+7 6 5 4
+5 4 3 2
+4 3 2 1\`)
+.scale("c:major").slow(2).s("${sound}")._pianoroll()`}/>
+
+## Alternierende Töne
+
+<MiniRepl name='alternating' tune={`n(\`
+0 1 0 1
+0 2 0 2
+0 4 0 4
+2 7 2 7\`)
+.slow(2).scale("c:major").s("${sound}")._pianoroll()`}/>
+
+Die kann man natürlich auch prima mit den bekannten Elementen schreiben:
+
+<MiniRepl name='alternating_patterns' tune={`n(\`
+[0 1]!2
+[0 2]!2
+[0 4]!2
+[2 7]!2\`)
+.slow(2).scale("c:major").s("${sound}")._pianoroll()`}/>
+
+Oder sogar:
+
+<MiniRepl name='alternating_patterns_nested' tune={`n(\`
+     [<0!3 2> <1 2 4 7>]!2*2
+\`)
+.scale("c:major").s("${sound}")._pianoroll()`}/>
+
+
+## Alternierende Sequenzen
+
+<MiniRepl name='alternating_sequences' tune={`n(\`
+0 1 0 1
+5 4 3 2
+0 1 0 1
+7 6 5 4\`)
+.slow(2).scale("c:major").s("${sound}")._pianoroll()`}/>
+
+Wenn jede zweite Sequenz gleich ist, lässt sich das auch wieder kompakter
+schreiben:
+
+<MiniRepl name='alternating_sequence_rule' tune={`n(\` [0 1 0 1]
+     <[5 4 3 2]
+      [7 6 5 4]>\`)
+.scale("c:major").s("${sound}")._pianoroll()`}/>
+
+
+## Verschiebungen
+
+<MiniRepl name='translations' tune={`n(\`
+0  5 [0 2]  5
+1  6 [1 3]  6
+2  7 [2 4]  7
+5  9    8   7
+\`)
+.slow(2).scale("c:major").s("${sound}")._pianoroll()`}/>
+
+Verschiebungen lassen sich natürlich besonders gut vom Computer berechnen:
+
+<MiniRepl name='translations_computed' tune={`n(\`
+[0  5 [0 2]  5]!3
+[5  9    8   7]
+\`.add("0 1 2 0"))
+.slow(2).scale("c:major").s("${sound}")._pianoroll()`}/>
+
+:::caution
+Das `.add()` steht noch in den Klammern vom `n()`! Es wirkt direkt auf das Zahlenmuster!
+:::
+
+## Rhythmus aufprägen
+
+Wenn man einen Lauf hat, kann man die Noten automatisch in einen Rhythmus
+bringen. Dafür gibt es den Befehl `struct()`. Darin verwendet man die Symbole
+`x` und `~` und die bekannten Muster-Operatoren wie `!`, `@`, `*` und `[]`.
+
+<MiniRepl name='struct' tune={`n(\`0 1 2 1
+2 3 4 5
+4 5 4 5
+4 3 2 1\`)
+.struct("[x@3 x]*8")
+.scale("c:major").slow(2).s("${sound}")._pianoroll()`}/>
+
+Etwas komplizierter:
+<MiniRepl name='struct_2' tune={`n(\`0 1 2 1
+2 3 4 5
+4 5 4 5
+4 3 2 1\`)
+.struct("[x@3 x x@2 x!2]*4")
+.scale("c:major").slow(2).s("${sound}")._pianoroll()`}/>
+
+Achtung, die Muster in `n()` und `struct()` laufen unabhängig gleichzeitig.
+Wenn in `struct()` zu einem Zeitpunkt kein `x` dran ist, wird der Ton
+übersprungen:
+<MiniRepl name='struct_skipping' tune={`n(\`0 1 2 1
+2 3 4 5
+4 5 4 5
+4 3 2 1\`)
+.struct("[x@3 x]*4")
+.scale("c:major").slow(2).s("${sound}")._pianoroll()`}/>
+
+## Swing
+
+So eine *Punktierung*, wie im ersten Beispiel ist ziemlich häufig, z.B. im
+Swing oder Blues - deswegen gibt es dafür extra den Befehl `swing(n)`. Die Zahl
+*n* führt dazu, dass das Muster in *n* Teile geteilt wird und die erste Hälfte
+jeweils um ein Drittel verlängert und die zweite um ein Drittel verkürzt wird:
+
+<MiniRepl name='swing' tune={`n(\`0 1 2 1
+2 3 4 5
+4 5 7 5
+4 3 2 1\`)
+.swing(8)
+.scale("c:major").slow(2).s("${sound}")._pianoroll()`}/>
+
+Wir verwenden hier *n = 8*, weil das unsere 16 Töne in Zweiergruppen bringt und
+die Hälften dann jeden zweiten Ton betreffen.
+
+Wenn man eine andere Verzögerung als ein Drittel möchte, kann man `swingBy(x, n)`
+verwenden. Das Muster wird wieder in *n* Teile geteilt und die jeweils erste
+Hälfte wird um den Faktor *x* verlängert und die zweite entsprechend verkürzt.
+
+<MiniRepl name='swingBy' tune={`n(\`0 1 2 1
+2 3 4 5
+4 5 6 5
+4 3 2 1\`)
+.swingBy(1/2, 8)
+.scale("c:harmonic:minor").slow(2).s("${sound}")._pianoroll()`}/>
+
+Probiert es aus!
+
+<LinkButton icon='right-arrow' href="../../exercises/05_melody_elements/">Übungen: Melodien mit typischen Elementen</LinkButton>

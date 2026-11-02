@@ -1,0 +1,114 @@
+---
+title: Intervalle
+description: Kluge Namen für Abstände zwischen Tönen
+---
+import { LinkCard, LinkButton } from "@astrojs/starlight/components";
+import MiniRepl from "../../../components/MiniRepl.astro";
+import BaseNote from "../../../components/BaseNote.astro";
+import PhaseShift from "../../../components/PhaseShift.astro";
+
+export const sound = "gm_synth_bass_2";
+export const fractionalFrequency = (base) => `.fmap(([n, z]) => n/z).mul(getFreq('${base}'))`;
+
+export const Interval = ({ ratio, base = "{{base}}" }) => (
+  <>
+    <MiniRepl mode="playOnly" tune={`freq("[1:1 ${ratio}]!2"${fractionalFrequency(base)}).s("sine")`} />
+    <MiniRepl mode="playOnly" tune={`freq("[1:1,${ratio}]"${fractionalFrequency(base)}).slow(8).s("sine")`} />
+  </>
+);
+
+export const EqualInterval = ({ steps, base = "{{base}}" }) => (
+  <>
+    <MiniRepl mode="playOnly" tune={`n("[0 ${steps}]!2").scale("${base}:chromatic").s("sine")`} />
+    <MiniRepl mode="playOnly" tune={`n("[0,${steps}]").scale("${base}:chromatic").slow(8).s("sine")`} />
+  </>
+);
+
+export const decimal = (x) => {
+  // "=" or "≈" and the value with three decimals at most, German style
+  const rounded = Number(x.toFixed(3));
+  return [rounded === x ? "=" : "≈", String(rounded).replace(".", ",")];
+};
+
+export const Ratio = ({ ratio }) => {
+  const [numerator, denominator] = ratio.split(":").map(Number);
+  const [op, value] = decimal(numerator / denominator);
+  return <>{ratio} {op} {value}</>;
+};
+
+export const EqualTempered = ({ steps }) => {
+  const root = <mroot><mn>2</mn><mn>12</mn></mroot>;
+  const [op, value] = decimal(2 ** (steps / 12));
+  return (
+    <math>
+      {steps === 1 ? root : <msup>{root}<mn>{steps}</mn></msup>}
+      <mo>{op}</mo><mn>{value}</mn>
+    </math>
+  );
+};
+
+Intervalle bezeichnen den Abstand von zwei Tönen in ihrer Tonhöhe (also nicht den zeitlichen Abstand, den Rhythmus). Intervalle sind uns schon bei den Tonleitern begegnet als Halb- und Ganztonabstand.
+
+In der Musik sind die Intervalle extrem wichtig, weil unterschiedlich große Abstände unterschiedlich klingen und unterschiedliche Gefühle hervorrufen. Das wollen wir uns hier ansehen.
+
+Da in einer Tonleiter ja nur eine gewisse Auswahl der bei uns üblichen 12 unterschiedlichen Töne vorkommen, schauen wir uns jetzt nochmal die Töne ohne Tonleiter an.
+
+Bei 12 unterschiedlichen Tönen gibt es 13 Abstände, wenn man den Abstand von einem Ton zu sich selbst und zu sich selbst eine Oktave höher mitzählt.
+
+Die Oktave ist uns auch schon begegnet: Der Ton, der doppelt so hoch ist, bei dem die Schwingung also doppelt so schnell ist (doppelt so viele Schwingungen pro Sekunde), wird als die Oktave zum ursprünglichen Ton bezeichnet. Tonleitern gehen immer über eine Oktave und bestimmen, welche Töne dazu gehören und welche nicht. Im gleichen Muster kann es dann nach oben oder unten weitergehen.
+
+Wir hatten schon bei den Flageolet-Tönen auf der Geigenseite kurz über die Obertöne geredet: Das sind die Töne, die natürlich entstehen, wenn man eine Flöte oder Trompete ohne unterschiedlich zu greifen überbläst, oder eben bei eine Saite durch leichtes Berühren der Seite an bestimmten Punkten die Obertöne gezielt anregt. Die Frequenzen verhalten sich dabei in ganzzahligem Verhältnis, d.h. 1:2:3:4:5:...
+
+Diese Obertöne werden bei den sogenannten *reinen* Intervallen zugrunde gelegt. Sie begegnen Euch in der folgenden Tabelle. Sie werden großteils nach unten oktaviert, um niedrigere Frequenzen zu erhalten. Dummerweise lassen sich so nur wenige Tonarten mit den entstehenden Intervallen spielen. Daher gibt es eine andere Methode, Intervalle zu definieren, die es erlauben, *alle 12 Tonarten* mit den gleichen Intervallen zu spielen. Diese heißen *gleichstufige* Intervalle. Sie klingen ähnlich aber durchaus nicht exakt gleich wie die reinen Intervalle. Diese gleichstufigen Intervalle sind die Basis für die Töne, die Euch Strudel über die Tonleitern erzeugt.
+
+Hier eine Tabelle über die Intervalle, bei der Ihr Euch auch die Intervalle in ihren Varianten anhören könnt:
+
+<BaseNote>
+
+| Abstand in Halbtönen | Name | Frequenzverhältnis | Bemerkung |
+| -------------------- | ---- | ------------------ | --------- |
+| 0 | Prim | <Ratio ratio="1:1" /> | Ein Ton klingt perfekt mit sich selbst; Verstärkung und Auslöschung möglich! |
+| 1 | kleine Sekunde, <br/>Halbton | rein: <br/><Ratio ratio="16:15" /> | <Interval ratio="16:15" /> Die kleine Sekunde ist der kleinste Tonabstand. Die Töne reiben sich merklich aneinander, man hört fast ein Schnarren darüber, wenn die beiden Töne gleichzeitig klingen. Das merkt man besonders, wenn man die beiden "klaren" Einzeltöne erst nacheinander und dann zusammen anhört. Gleichzeitig gespielt wird die kleine Sekunde oft als "dissonant" empfunden.|
+|  |  | gleichstufig: <br/><EqualTempered steps={1} /> | <EqualInterval steps={1} /> In der gleichstufigen Stimmung liegen die Töne noch ein bisschen näher beieinander (1,059 < 1,067). Dadurch ist die Reibung noch deutlicher zu hören. |
+| 2 | große Sekunde, <br/>Ganzton | rein: <br/><Ratio ratio="9:8" /> | <Interval ratio="9:8" /> Die große Sekunde ist der Anfang der Dur- und Molltonleiter und von "Alle meine Entchen". Hier sind die Töne schon so weit voneinander entfernt, dass man das Reiben nicht mehr so heftig hört. Dennoch wird auch eine große Sekunde selten gleichzeitig angespielt, außer man will den Wunsch nach der Auflösung der Dissonanz erzeugen. |
+|  |  | gleichstufig: <br/><EqualTempered steps={2} /> | <EqualInterval steps={2} /> Im Gegensatz zur *kleinen* Sekunde liegen "rein" und "gleichstufig" bei der großen Sekunde viel näher beieinander. Ein Unterschied ist kaum zu hören. |
+| 3 | kleine Terz | rein: <br/><Ratio ratio="6:5" /> | <Interval ratio="6:5" /> Die kleine Terz kommt vom Grundton aus in der Molltonleiter vor. Von oben nach unten gespielt findet man sie auch im Ruf des Kuckucks - und natürlich am Anfang des entsprechenden Volkslieds. <br/> Zusammengespielt kommt sie in fast jedem Akkord vor und wird als wohlklingend, melancholisch empfunden. |
+|  |  | gleichstufig: <br/><EqualTempered steps={3} /> | <EqualInterval steps={3} /> Die gleichstufige kleine Terz ist wieder nahe an der reinen, aber hat wegen des etwas geringeren Abstands zum Grundton einen etwas niedrigeren *Unterton*.|
+| 4 | große Terz | rein: <br/><Ratio ratio="5:4" /> | <Interval ratio="5:4" /> Die große Terz kommt vom Grundton aus in der Durtonleiter vor. <br/> Zusammengespielt kommt auch sie in fast jedem Akkord vor und wird als wohlklingend, strahlend empfunden. |
+|  |  | gleichstufig: <br/><EqualTempered steps={4} /> | <EqualInterval steps={4} /> Die gleichstufige große Terz ist wieder nahe an der reinen, aber hat wegen des etwas größeren Abstands zum Grundton einen etwas höheren *Unterton*.|
+| 5 | Quarte | rein: <br/><Ratio ratio="4:3" /> | <Interval ratio="4:3" /> Auch die Quarte kommt in sehr vielen Akkorden vor und ist in der Harmonielehre sehr wichtig - mehr dazu später! Da sie ein einfaches Frequenzverhältnis hat, klingt sie harmonisch. <br/> Die Quarte bildet auch den Klang des "Tatütata" von Einsatzfahrzeugen (Martinshorn)! Außerdem sind viele Instrumente in Quarten gestimmt, z.B. die Saiten des E-Basses, des Kontrabasses, der Gitarre (bis auf einen Abstand in großer Terz) und der Laute.
+|  |  | gleichstufig: <br/><EqualTempered steps={5} /> | <EqualInterval steps={5} /> Die gleichstufige Quarte ist sehr nahe an der reinen Quarte - ein Unterschied kaum zu hören. |
+| 6 | Tritonus: <br/>übermäßige Quarte | rein: <br/><Ratio ratio="45:32" /> | <Interval ratio="45:32" /> Der Tritonus kommt in der ursprünglichen reinen Stimmung gar nicht vor. Er galt im Mittelalter als schwer zu singen und wurde von vielen Komponist:innen gemieden. Es gab den Mythos, das Intervall sei gar verboten. Im 18. Jahrhundert wurde er als "Teufelsintervall" beschrieben. In der Klassik und im Barock wurde er als Zeichen für Angst, Schrecken und das Dämonische verwendet. Der dissonante Klang löst ein Bedürfnis nach Auflösung aus. <br/> Im Jazz und der Moderne spielt er eine wichtige Rolle in der Harmonielehre und ist Bestandteil vieler wichtiger Akkorde. |
+|  | Tritonus: <br/>verminderte Quinte | rein: <br/><Ratio ratio="64:45" /> | <Interval ratio="64:45" /> Der Tritonus kann in der reinen Stimmung neben der übermäßigen Quarte (Quarte plus Halbton) auf als verminderte Quinte (Quinte minus Halbton) erzeugt werden. Das ergibt eine andere Tonhöhe. |
+|  | Tritonus: <br/>Halboktave | gleichstufig: <br/><EqualTempered steps={6} /> | <EqualInterval steps={6} /> In der gleichstufigen Stimmung liegt der Tritonus zwischen den beiden reinen Varianten und zudem *exakt* in der Mitte der Oktave! Zwei Tritoni übereinander sind also eine Oktave (in der gleichstufigen Stimmung)! |
+| 7 | Quinte | rein: <br/><Ratio ratio="3:2" /> | <Interval ratio="3:2" /> Die Quinte hat nach der Oktave das einfachste Frequenzverhältnis zum Grundton. Sie klingt sehr rein und ist Bestandteil der meisten Akkorde. Die Quinte ist grundlegend für die Harmonielehre. Dazu kommen wir im nächsten Thema! <br/> Die Quinte ist auch der Tonabstand der Saiten von Geige, Bratsche, Cello und Mandoline. Interessanterweise nicht vom Kontrabass - der ist in Quarten gestimmt! |
+|  |  | gleichstufig: <br/><EqualTempered steps={7} /> | <EqualInterval steps={7} /> Die gleichstufige Quinte liegt wieder sehr nah an der reinen und ist kaum unterscheidbar. |
+| 8 | kleine Sexte | rein: <br/><Ratio ratio="8:5" /> | <Interval ratio="8:5" /> Die kleine Sexte ist das Komplementärintervall zur großen Terz. Das heißt, wenn man erst eine große Terz hochgeht und von dort eine kleine Sext (oder umgekehrt), kommt man bei der Oktave raus. Sie taucht bei den Umkehrungen von Akkorden auf, ist also oft zu hören und hat einen harmonischen, melancholischen Klang.|
+|  |  | gleichstufig: <br/><EqualTempered steps={8} /> | <EqualInterval steps={8} /> Entsprechend der großen Terz liegt die gleichstufige kleine Sexte wieder nah an der reinen und klingt entsprechend ähnlich. |
+| 9 | große Sexte | rein: <br/><Ratio ratio="5:3" /> | <Interval ratio="5:3" /> Die große Sexte ist analog das Komplementärintervall zur kleinen Terz. Wie eben bildet also eine kleine Terz und eine darauf aufbauende große Sexte (oder umgekehrt) zusammen eine Oktave. Auch sie taucht bei (anderen) Umkehrungen von Akkorden auf. Sie hat einen harmonischen, strahlenden Klang.|
+|  |  | gleichstufig: <br/><EqualTempered steps={9} /> | <EqualInterval steps={9} /> So, wie die kleine Terz gleichstufig und rein recht weit auseinander liegt, so ist es folglich auch bei der großen Sexte. Die gleichstufige ist etwas größer und hat daher einen höheren Unterton.|
+| 10 | kleine Septim | rein: <br/><Ratio ratio="9:5" /> | <Interval ratio="9:5" /> Die kleine Septim ist in der reinen Stimmung *nicht* das Komplementärintervall zur großen Sekunde. Sonst müsste das Verhältnis 16:9 sein. Sie klingt etwas dissonant, deutlich weniger als die große Sekunde, aber spielt eine extrem wichtige Rolle in der Harmonielehre. Fügt man sie einem Akkord hinzu, drängt sich ein Akkordwechsel zu einer Auflösung geradezu auf, auch weil sie mit der oft vorkommenden großen Terz dann einen Tritonus bildet. Kurzum ist sie besonders in der Blues- und Popmusik sehr oft anzutreffen.|
+|  |  | komplementär: <br/><Ratio ratio="16:9" /> | <Interval ratio="16:9" /> So klänge sie, wenn sie komplementär zur reinen großen Terz wäre!|
+|  |  | gleichstufig: <br/><EqualTempered steps={10} /> | <EqualInterval steps={10} /> Im Gegensatz zu reiner und gleichstufiger großer Terz, liegen die gleichstufige und reine kleine Septim weiter auseinander. Die gleichstufige liegt ziemlich nach an der komplementären kleinen Septim!|
+|  |  | Naturton: <br/><Ratio ratio="7:4" /> | <Interval ratio="7:4" /> In der Nähe der reinen kleinen Septim liegt auch noch ein (nach unten oktavierter) Oberton, der in üblichen Stimmungen nicht verwendet wird, aber sehr rein klingt wegen des recht einfachen Frequenzverhältnisses.|
+| 11 | große Septim | rein: <br/><Ratio ratio="15:8" /> | <Interval ratio="15:8" /> Die große Septim ist der letzte Halbton vor der Oktave. Wenn man eine Tonleiter bis dorthin spielt und dann stoppt, fühlt sich das äußerst unvollkommen an. Es gibt die Anekdote, dass Leopold Mozart den jungen Wolfgang morgens aus dem Bett holte, indem er im Wohnzimmer so eine unvollständige Tonleiter spielte, was Wolfgang nicht ertragen konnte und dann aufstand, um die erlösende Oktave zu spielen. Diese Funktion nennt man *Leitton*. In Akkorden spielt sie besonders im Jazz, Bossa Nova, Soul und Pop eine große Rolle. <br/> Mozarts Weckton: <MiniRepl mode="playOnly" tune='n("0 1 2 3 4 5 6").slow(2).scale("c4:major").piano().filterWhen(t => t < 2)'/> ... und die Erlösung: <MiniRepl mode="playOnly" tune='n("7").scale("c4:major").piano().filterWhen(t => t < 1)'/>|
+|  |  | gleichstufig: <br/><EqualTempered steps={11} /> | <EqualInterval steps={11} /> Da die reine große Septim komplementär zur reinen kleinen Sekunde ist, liegen die reine und gleichstufige große Septim wie die kleinen Sekunden merklich auseinander.
+| 12 | Oktave | rein: <br/><Ratio ratio="2:1" /> | <Interval ratio="2:1" /> Bei der Oktave treffen je zwei Schwingungen auf eine Schwingung des Grundtons, daher verschiebt sich wenig und der Ton klingt sehr ähnlich. Bei Instrumenten mit Obertönen (im Gegensatz zum sterilen Sinus-Ton) ist die Oktave meist Teil des Grundtons. Sie passen also hervorragend zusammen und werden oft als "der gleiche Ton, nur höher" wahrgenommen.|
+|  |  | gleichstufig: <br/><EqualTempered steps={12} /> | <EqualInterval steps={12} /> Die gleichstufige und die reine Oktave stimmen exakt überein - so ist das ja auch konstruiert. Die zwölfte Wurzel aus Zwei hoch Zwölf ergibt eben wieder Zwei.|
+
+</BaseNote>
+
+## Exkurs: Phasenlage
+
+Mit diesem interaktiven Diagramm können wir uns ansehen, was Phasenlage bedeutet:
+Zwei gleiche Töne werden ein winziges bisschen zeitverzögert abgespielt. Töne setzen sich zusammen, indem sie addiert werden. Im Diagramm könnt Ihr die Verschiebung einstellen und sehen, was das mit der Summe macht. Es gibt konstruktive und destruktive Interferenz, Verstärkung und Auslöschung. Auf diesem Prinzip arbeiten übrigens Noise-Cancelling-Kopfhörer. Sie produzieren einen umgekehrten Anti-Schall.
+
+<PhaseShift />
+
+:::tip[Bonus]{icon="comment"}
+Interessant ist auch, dass das menschliche Gehör tatsächlich Phasenlage wahrnehmen kann: Schalte auf "Stereo" um. Dann werden die Töne nicht mehr addiert, sondern getrennt auf den linken und rechten Kopfhörer verteilt. Achte mal auf den Eindruck, den der Ton macht. Fällt Euch was auf und könnt Ihr Euch das erklären?
+:::
+
+## Sprunghafte Übungen mit Intervallen
+
+<LinkButton icon='right-arrow' href="../../exercises/06_intervals/">Übungen: Melodien mit Intervallen</LinkButton>

@@ -35,9 +35,17 @@ export default defineConfig({
           { label: 'Erste Schritte', slug: 'guides/first_steps' },
           { label: 'Schlagzeug-Noten', slug: 'guides/drum_notation' },
           { label: 'Schallwellen', slug: 'guides/physical_sounds' },
-          { label: 'Melodien', slug: 'guides/melodies' },
-          { label: 'Tonleitern', slug: 'guides/scales' },
-          { label: 'Zufälligkeiten', slug: 'guides/randomness' },
+          {
+            label: 'Melodien',
+            items: [
+              { label: 'Erste Melodien', slug: 'guides/melodies', },
+              { label: 'Tonleitern', slug: 'guides/scales' },
+              { label: 'Zufälligkeiten', slug: 'guides/randomness' },
+              { label: 'Typische Elemente', slug: 'guides/melody_elements' },
+              { label: 'Intervalle', slug: 'guides/intervals' },
+            ]
+          },
+          // { label: 'Harmonien', slug: 'guides/harmonies' },
         ],
       },
       {

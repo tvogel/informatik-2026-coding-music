@@ -1,0 +1,53 @@
+---
+title: "Übungen 5: Melodien mit typischen Elementen"
+description: Probiert Läufe, alternierende Töne, Sequenzen, Verschiebungen, Rhythmisierung und Swing!
+---
+import { LinkCard, LinkButton } from '@astrojs/starlight/components';
+import MiniRepl from "../../../components/MiniRepl.astro";
+import Checklist from "../../../components/Checklist.astro";
+import dedent from "dedent";
+
+Probiert mal die neuen Motive aus:
+
+<Checklist name="motive">
+- [ ] Läufe
+- [ ] alternierende Töne
+- [ ] alternierende Sequenzen
+- [ ] Verschiebungen
+- [ ] Rhythmisierung mit `struct()`
+- [ ] Rhythmus mit `swing()`
+</Checklist>
+
+## Melodie-Werkstatt
+
+<MiniRepl name='melody_playground' tune={`
+$: n("0 1 2 3")
+.scale("A:minor")
+.sound("gm_xylophone")
+._pianoroll()
+`}/>
+
+## Bonus: Motive gegen die Langeweile
+
+Es gibt weitere Motive, die wir noch nicht besprochen haben. Suche selbständig Informationen dazu und probiere sie aus. Wenn Du Dich firm damit fühlst, bist Du herzlich eingeladen, uns allen davon zu erzählen!
+
+Vielleicht findest Du noch weitere [Motivtechniken](https://de.wikipedia.org/wiki/Motiv_(Musik)#Verarbeitungsm%C3%B6glichkeiten_des_Motivs) im Netz?
+
+<Checklist name="advanced_techniques" addable="eine weitere Technik…?">
+- [ ] Krebs
+- [ ] Umkehrung
+- [ ] Krebsumkehrung
+</Checklist>
+
+### Platz für weitere Motive
+<MiniRepl name='advanced_melody_playground' tune={`
+$: n("0 1 2 3")
+.scale("A:minor")
+.sound("gm_xylophone")
+._pianoroll()
+`}/>
+
+
+## Weiter geht es mit *Intervallen*
+
+<LinkButton icon='right-arrow' href="../../guides/intervals/">Intervalle</LinkButton>
