@@ -302,6 +302,15 @@ const hasDefaultTune = tune.trim().length > 0;
         silence(true, () => !started);
       });
 
+      // Lets other components (e.g. BaseNote) apply changed code at once:
+      // re-evaluating would continue the pattern where it is, so long notes
+      // keep their old pitch until their next onset.
+      repl.addEventListener("mini-repl:restart", () => {
+        repl!.editor?.stop();
+        silence(false);
+        repl!.editor?.evaluate();
+      });
+
       $.optional("undo")?.addEventListener("click", () => {
         triggerHistoryAction("historyUndo");
       });

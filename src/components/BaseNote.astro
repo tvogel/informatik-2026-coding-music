@@ -3,7 +3,7 @@
  * Wraps content with MiniRepl editors and adds an input for their base
  * note. The editors' code has to name the default note in quotes, e.g.
  * `getFreq('a4')` or `scale("a4:chromatic")`; changing the input replaces
- * it there and re-evaluates a playing editor.
+ * it there and restarts a playing editor.
  */
 interface Props {
   default?: string;
@@ -66,7 +66,9 @@ const { default: base = "a4", label = "Grundton" } = Astro.props;
           (repl) => {
             repl.dataset.baseTemplate ??= repl.getAttribute("code") ?? "";
             repl.setAttribute("code", repl.dataset.baseTemplate.replace(quoted, `$1${note}`));
-            if (repl.editor?.repl?.scheduler?.started) repl.editor.evaluate();
+            if (repl.editor?.repl?.scheduler?.started) {
+              repl.dispatchEvent(new Event("mini-repl:restart"));
+            }
           },
         );
       };
