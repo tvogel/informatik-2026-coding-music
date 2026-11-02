@@ -44,6 +44,8 @@ const content = (await Astro.slots.render("default")).replace(
 </base-note>
 
 <script>
+  import { setTune } from "../lib/miniRepl";
+
   const NOTE = /^([a-g])(#|b)?(\d)$/;
   const OFFSETS: Record<string, number> = { c: 0, d: 2, e: 4, f: 5, g: 7, a: 9, b: 11 };
 
@@ -75,12 +77,8 @@ const content = (await Astro.slots.render("default")).replace(
         output.textContent = `${hz.toLocaleString("de-DE", { maximumFractionDigits: 1 })} Hz`;
         this.querySelectorAll<HTMLElement>("[data-base-template]").forEach((element) => {
           // the editor MiniRepl creates for this tune
-          const repl = element.querySelector<HTMLElement & { editor?: any }>("strudel-editor");
-          if (!repl) return;
-          repl.setAttribute("code", element.dataset.baseTemplate!.replaceAll("{{base}}", note));
-          if (repl.editor?.repl?.scheduler?.started) {
-            repl.dispatchEvent(new Event("mini-repl:restart"));
-          }
+          const repl = element.querySelector<HTMLElement>("strudel-editor");
+          if (repl) setTune(repl, element.dataset.baseTemplate!.replaceAll("{{base}}", note));
         });
       };
       input.addEventListener("change", apply);
