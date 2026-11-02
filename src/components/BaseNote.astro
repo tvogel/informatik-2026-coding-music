@@ -1,19 +1,31 @@
 ---
 /*
  * Wraps content with MiniRepl editors and adds an input for their base
- * note. The editors' code has to name the default note in quotes, e.g.
- * `getFreq('a4')` or `scale("a4:chromatic")`; changing the input replaces
- * it there and restarts a playing editor.
+ * note. The editors' tunes write it as `{{base}}`, e.g. `getFreq('{{base}}')`
+ * or `scale("{{base}}:chromatic")`. The placeholder is replaced by the
+ * default note when the page is built and by the input's note when it
+ * changes; a playing editor restarts then.
  */
 interface Props {
   default?: string;
   label?: string;
 }
 
+const PLACEHOLDER = "{{base}}";
 const { default: base = "a4", label = "Grundton" } = Astro.props;
+
+// MiniRepl reads its tune from data-default-tune; the template is kept next
+// to it. Attribute values are escaped, so they cannot contain a plain quote.
+const content = (await Astro.slots.render("default")).replace(
+  /data-default-tune="([^"]*)"/g,
+  (attribute, tune: string) =>
+    tune.includes(PLACEHOLDER)
+      ? `data-default-tune="${tune.replaceAll(PLACEHOLDER, base)}" data-base-template="${tune}"`
+      : attribute,
+);
 ---
 
-<base-note data-default={base}>
+<base-note>
   <div class="controls not-content">
     <label>
       {label}:
@@ -28,7 +40,7 @@ const { default: base = "a4", label = "Grundton" } = Astro.props;
     </label>
     <output></output>
   </div>
-  <slot />
+  <Fragment set:html={content} />
 </base-note>
 
 <script>
@@ -51,7 +63,6 @@ const { default: base = "a4", label = "Grundton" } = Astro.props;
     connectedCallback() {
       const input = this.querySelector("input")!;
       const output = this.querySelector("output")!;
-      const quoted = new RegExp(`(["'])${this.dataset.default}(?=[:"'])`, "g");
 
       const apply = () => {
         const note = input.value.trim().toLowerCase();
@@ -62,15 +73,15 @@ const { default: base = "a4", label = "Grundton" } = Astro.props;
           return;
         }
         output.textContent = `${hz.toLocaleString("de-DE", { maximumFractionDigits: 1 })} Hz`;
-        this.querySelectorAll<HTMLElement & { editor?: any }>("strudel-editor").forEach(
-          (repl) => {
-            repl.dataset.baseTemplate ??= repl.getAttribute("code") ?? "";
-            repl.setAttribute("code", repl.dataset.baseTemplate.replace(quoted, `$1${note}`));
-            if (repl.editor?.repl?.scheduler?.started) {
-              repl.dispatchEvent(new Event("mini-repl:restart"));
-            }
-          },
-        );
+        this.querySelectorAll<HTMLElement>("[data-base-template]").forEach((element) => {
+          // the editor MiniRepl creates for this tune
+          const repl = element.querySelector<HTMLElement & { editor?: any }>("strudel-editor");
+          if (!repl) return;
+          repl.setAttribute("code", element.dataset.baseTemplate!.replaceAll("{{base}}", note));
+          if (repl.editor?.repl?.scheduler?.started) {
+            repl.dispatchEvent(new Event("mini-repl:restart"));
+          }
+        });
       };
       input.addEventListener("change", apply);
       apply();
