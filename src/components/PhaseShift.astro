@@ -167,8 +167,9 @@ const { wave = "sine", freq = 440, degrees = 90 } = Astro.props;
       const STEPS: Record<string, number> = {
         ArrowRight: 5,
         ArrowLeft: -5,
-        PageUp: 15,
-        PageDown: -15,
+        // as on the keyboard: page down sits above the right arrow
+        PageDown: 15,
+        PageUp: -15,
       };
       let keyTimer: ReturnType<typeof setTimeout> | undefined;
       svg.addEventListener("keydown", (event) => {
