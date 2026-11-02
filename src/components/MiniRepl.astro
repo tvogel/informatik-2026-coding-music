@@ -253,8 +253,10 @@ const hasDefaultTune = tune.trim().length > 0;
       };
 
       $("start").addEventListener("click", () => {
-        // also cuts notes still ringing from another editor
-        silence(false);
+        // Cuts notes still ringing from another editor. Not while this one
+        // plays: re-evaluating continues the pattern where it is, so its
+        // current notes would only be replaced at their next onset.
+        if (!started) silence(false);
         repl!.editor?.evaluate();
       });
 
