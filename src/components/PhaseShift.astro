@@ -1,33 +1,43 @@
 ---
 /*
- * Plots a reference sine over two periods together with a copy that can be
- * shifted horizontally (by dragging the plot or with the slider) and the sum
- * of both. A play-only MiniRepl plays the two sines with the chosen shift,
- * mixed (mono) or the reference left and the copy right (stereo).
+ * Plots a reference wave (sine or triangle) over two periods together with
+ * a copy that can be shifted horizontally (by dragging the plot or with the
+ * slider) and the sum of both. A play-only MiniRepl plays the two waves with
+ * the chosen shift, mixed (mono) or the reference left and the copy right
+ * (stereo).
  */
 import MiniRepl from "./MiniRepl.astro";
-import { phaseTune } from "../lib/phaseTune";
+import { phaseTune, type Wave } from "../lib/phaseTune";
 
 interface Props {
-  /** frequency of both sines in Hz */
+  /** initial wave */
+  wave?: Wave;
+  /** frequency of both waves in Hz */
   freq?: number;
   /** initial shift in degrees */
   degrees?: number;
 }
 
-const { freq = 440, degrees = 90 } = Astro.props;
+const { wave = "sine", freq = 440, degrees = 90 } = Astro.props;
 ---
 
 <phase-shift data-freq={freq} data-degrees={degrees}>
   <div class="controls not-content">
     <label>
       Verschiebung:
-      <input type="range" min="0" max="360" step="1" value={degrees} />
+      <input type="range" min="0" max="360" step="1" value={degrees} autocomplete="off" />
     </label>
     <output></output>
     <label>
+      Welle:
+      <select name="wave" autocomplete="off">
+        <option value="sine" selected={wave === "sine"}>Sinus</option>
+        <option value="triangle" selected={wave === "triangle"}>Dreieck</option>
+      </select>
+    </label>
+    <label>
       Wiedergabe:
-      <select>
+      <select name="playback" autocomplete="off">
         <option value="mono">Mono: beide zusammen</option>
         <option value="stereo">Stereo: Referenz links, verschoben rechts</option>
       </select>
@@ -51,12 +61,12 @@ const { freq = 440, degrees = 90 } = Astro.props;
       entsteht dann nicht im Signal.
     </span>
   </p>
-  <MiniRepl mode="playOnly" tune={phaseTune(freq, degrees, false)} />
+  <MiniRepl mode="playOnly" tune={phaseTune(wave, freq, degrees, false)} />
 </phase-shift>
 
 <script>
   import { setTune } from "../lib/miniRepl";
-  import { phaseTune } from "../lib/phaseTune";
+  import { phaseTune, waveShape, type Wave } from "../lib/phaseTune";
 
   // viewBox: two periods of 200 units, amplitude 35 around the middle line
   const PERIOD = 200;
@@ -82,44 +92,41 @@ const { freq = 440, degrees = 90 } = Astro.props;
     connectedCallback() {
       const freq = Number(this.dataset.freq);
       const slider = this.querySelector<HTMLInputElement>("input[type=range]")!;
-      const select = this.querySelector("select")!;
+      const waveSelect = this.querySelector<HTMLSelectElement>("select[name=wave]")!;
+      const playback = this.querySelector<HTMLSelectElement>("select[name=playback]")!;
       const output = this.querySelector("output")!;
       const svg = this.querySelector("svg")!;
       const [shifted, sum] = ["shifted", "sum"].map(
         (name) => this.querySelector(`.curve--${name}`)!,
       );
+      const reference = this.querySelector(".curve--reference")!;
       const handles = this.querySelectorAll(".handle");
-      const omega = (2 * Math.PI) / PERIOD;
-      this.querySelector(".curve--reference")!.setAttribute(
-        "d",
-        path((x) => Math.sin(omega * x)),
-      );
 
       let degrees = Number(slider.value);
       const draw = () => {
+        const shape = waveShape(waveSelect.value as Wave);
+        const at = (x: number) => shape(x / PERIOD);
         const shift = (degrees / 360) * PERIOD;
-        shifted.setAttribute("d", path((x) => Math.sin(omega * (x - shift))));
-        sum.setAttribute(
-          "d",
-          path((x) => Math.sin(omega * x) + Math.sin(omega * (x - shift))),
-        );
-        // on the upward zero crossings of the shifted sine
+        reference.setAttribute("d", path(at));
+        shifted.setAttribute("d", path((x) => at(x - shift)));
+        sum.setAttribute("d", path((x) => at(x) + at(x - shift)));
+        // where the shifted wave's periods begin
         handles.forEach((handle, i) => {
           handle.setAttribute("cx", String((shift + i * PERIOD) % (2 * PERIOD)));
-          handle.setAttribute("cy", String(MIDDLE));
+          handle.setAttribute("cy", String(MIDDLE - AMPLITUDE * shape(0)));
         });
         slider.value = String(degrees);
         output.textContent = describe(degrees);
         svg.setAttribute(
           "aria-label",
-          `Zwei Sinuskurven, um ${describe(degrees)} gegeneinander verschoben, und ihre Summe`,
+          `Zwei ${waveSelect.value === "sine" ? "Sinus" : "Dreiecks"}kurven, um ${describe(degrees)} gegeneinander verschoben, und ihre Summe`,
         );
       };
       const play = () => {
         const repl = this.querySelector<HTMLElement>("strudel-editor");
-        const stereo = select.value === "stereo";
+        const stereo = playback.value === "stereo";
         this.classList.toggle("is-stereo", stereo);
-        if (repl) setTune(repl, phaseTune(freq, degrees, stereo));
+        if (repl) setTune(repl, phaseTune(waveSelect.value as Wave, freq, degrees, stereo));
       };
 
       slider.addEventListener("input", () => {
@@ -127,9 +134,13 @@ const { freq = 440, degrees = 90 } = Astro.props;
         draw();
       });
       slider.addEventListener("change", play);
-      select.addEventListener("change", play);
+      waveSelect.addEventListener("change", () => {
+        draw();
+        play();
+      });
+      playback.addEventListener("change", play);
 
-      // dragging anywhere on the plot moves the shifted sine along
+      // dragging anywhere on the plot moves the shifted wave along
       let drag: { x: number; degrees: number } | undefined;
       svg.addEventListener("pointerdown", (event) => {
         drag = { x: event.clientX, degrees };
