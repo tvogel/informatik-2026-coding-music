@@ -90,7 +90,11 @@ const hasDefaultTune = tune.trim().length > 0;
             >
               <span aria-hidden="true">↺</span>
             </button>
-            <div data-target="reference" data-default-tune={tune} />
+            <div
+              class="code-pane__code"
+              data-target="reference"
+              data-default-tune={tune}
+            />
           </aside>
         )) || <div data-target="reference" data-default-tune={tune} />)
     }
@@ -342,6 +346,8 @@ const hasDefaultTune = tune.trim().length > 0;
 <style>
   .root {
     display: grid;
+    /* long code lines must not widen the page */
+    grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
     padding: 0.5rem;
   }
@@ -463,8 +469,10 @@ const hasDefaultTune = tune.trim().length > 0;
   }
 
   @media (max-width: 899px) {
-    .code-pane {
-      max-height: 20rem;
+    /* scroll the code, not the pane, so the reset button stays visible */
+    .code-pane__code {
+      max-height: 17.25rem;
+      overflow: auto;
     }
   }
 </style>
