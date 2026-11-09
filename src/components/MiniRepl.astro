@@ -469,10 +469,10 @@ const hasDefaultTune = tune.trim().length > 0;
   }
 
   @media (max-width: 899px) {
-    /* scroll the code, not the pane, so the reset button stays visible */
+    /* scroll long lines in the code, not the pane, so the reset button
+       stays visible */
     .code-pane__code {
-      max-height: 17.25rem;
-      overflow: auto;
+      overflow-x: auto;
     }
   }
 </style>
