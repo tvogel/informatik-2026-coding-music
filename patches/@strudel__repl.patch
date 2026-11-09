@@ -1,52 +1,162 @@
 diff --git a/dist/index-1NNF4L0p.js b/dist/index-1NNF4L0p.js
-index dded4abb4ba009933974c0fcdf16d4bb238825c2..db77dd6fb9e3ee2c83fd02ffe7b3946bed86b912 100644
+index dded4abb4ba009933974c0fcdf16d4bb238825c2..91a7bcd4807d25886e6198cf0d64e8a7f724bd65 100644
 --- a/dist/index-1NNF4L0p.js
 +++ b/dist/index-1NNF4L0p.js
-@@ -6787,7 +6787,9 @@ function iD(t) {
+@@ -6786,8 +6786,17 @@ let Wi = {};
+ function iD(t) {
    Wi[t] !== void 0 && (cancelAnimationFrame(Wi[t]), delete Wi[t]);
  }
- function E6(t) {
+-function E6(t) {
 -  Object.keys(Wi).forEach((e) => (!t || e.startsWith(t)) && iD(e));
-+  // Only this editor and its widgets (`${id}_widget_...`): a bare prefix
-+  // match made `strudel_editor_1` cancel the draws of `strudel_editor_12`.
-+  Object.keys(Wi).forEach((e) => (!t || e === t || e.startsWith(t + "_")) && iD(e));
++function E6(t, n) {
++  function shallStop(e) {
++    if (!t) return !0;
++    // not owned by any replID (global animations like pianoroll())
++    if (!e.includes("_widget_")) return n;
++    // owned by this replID (widgets)
++    if (e === t || e.startsWith(`${t}_`)) return !0;
++    // owned by another replID
++    return !1;
++  }
++  Object.keys(Wi).forEach((e) => shallStop(e) && iD(e));
  }
  let sa = {};
  fe.prototype.draw = function(t, e) {
-@@ -16525,7 +16527,8 @@ function t9(t, e, n) {
-     let C = g * f, S = v * f;
-     if (w !== 0) {
-       const E = Math.cos($b * w), W = Math.sin($b * w);
--      C = E * C - W * S, S = W * C + E * S;
-+      // rotate with the old C (fixed upstream after 1.3.0)
-+      [C, S] = [E * C - W * S, W * C + E * S];
-     }
-     a[h + 1] = C, i[h + 1] = S;
+@@ -6807,9 +6816,9 @@ fe.prototype.draw = function(t, e) {
+   };
+   return Wi[n] = requestAnimationFrame(l), this;
+ };
+-const sb = (t = !0, e) => {
++const sb = (t = !0, e, s) => {
+   const n = ma();
+-  t && n.clearRect(0, 0, n.canvas.width, n.canvas.height), E6(e);
++  t && n.clearRect(0, 0, n.canvas.width, n.canvas.height), E6(e, s);
+ };
+ fe.prototype.onPaint = function(t) {
+   return this.withState((e) => (e.controls.painters || (e.controls.painters = []), e.controls.painters.push(t), e));
+@@ -13820,6 +13829,7 @@ function bV(t, e = {}) {
+     onComment: i
+   });
+   const l = VV(i, t.length);
++  let sliderCount = 0;
+   let c = [];
+   const u = (v, w) => {
+     const C = Xl.get("minilang");
+@@ -13862,8 +13872,8 @@ function bV(t, e = {}) {
+         const { value: C } = v;
+         return this.skip(), r && u(C, v), this.replace(Xb(C, v));
+       }
+-      if (DV(v))
+-        return a && h.push({
++      if (DV(v)) {
++        const C = {
+           from: v.arguments[0].start,
+           to: v.arguments[0].end,
+           value: v.arguments[0].raw,
+@@ -13871,8 +13881,12 @@ function bV(t, e = {}) {
+           min: v.arguments[1]?.value ?? 0,
+           max: v.arguments[2]?.value ?? 1,
+           step: v.arguments[3]?.value,
+-          type: "slider"
+-        }), this.replace(GV(v));
++          type: "slider",
++          id: e.id,
++          index: sliderCount++
++        };
++        return a && h.push(C), this.replace(GV(v, C));
++      }
+       if (AV(v)) {
+         const C = v.callee.property.name, S = h.filter((W) => W.type === C).length, E = {
+           to: v.end,
+@@ -14070,8 +14084,11 @@ function DV(t) {
+ function AV(t) {
+   return t.type === "CallExpression" && nA.includes(t.callee.property?.name);
+ }
+-function GV(t) {
+-  const e = "slider_" + t.arguments[0].start;
++function getSliderID(t) {
++  return `${t.id || ""}_slider_${t.index}`;
++}
++function GV(t, n) {
++  const e = getSliderID(n);
+   return t.arguments.unshift({
+     type: "Literal",
+     value: e,
+@@ -44241,8 +44258,8 @@ function Tne(t) {
+ let no = {};
+ const jne = (t) => `slider_${t}`;
+ class gR extends Pr {
+-  constructor(e, n, s, r, a, i, o) {
+-    super(), this.value = e, this.min = n, this.max = s, this.from = r, this.originalFrom = r, this.to = a, this.step = i, this.view = o;
++  constructor(e, n, s, r, a, i, o, d) {
++    super(), this.value = e, this.min = n, this.max = s, this.from = r, this.originalFrom = r, this.to = a, this.step = i, this.view = o, this.sliderID = d;
    }
-@@ -46792,7 +46795,10 @@ if (typeof HTMLElement < "u") {
-       const n = document.createElement("div");
-       this.parentElement.insertBefore(n, this.nextSibling);
-       const s = ma(), r = [-2, 2];
-+      t.instanceCount = (t.instanceCount ?? 0) + 1;
-+      const editorId = this.getAttribute("id") || `strudel_editor_${t.instanceCount}`;
-       this.editor = new zR({
-+        id: editorId,
-         defaultOutput: O0,
-         getTime: () => st().currentTime,
-         transpiler: bV,
-diff --git a/repl-component.mjs b/repl-component.mjs
-index cb79a47551932a5e59ed219109b012d77ed1389e..5b743c5ac3e406545fcf7af9107b9142794f383c 100644
---- a/repl-component.mjs
-+++ b/repl-component.mjs
-@@ -36,7 +36,11 @@ if (typeof HTMLElement !== 'undefined') {
-       this.parentElement.insertBefore(container, this.nextSibling);
-       const drawContext = getDrawContext();
-       const drawTime = [-2, 2];
-+      // unique id per editor, so inline widgets (_pianoroll etc.) of different editors get distinct DOM ids
-+      StrudelRepl.instanceCount = (StrudelRepl.instanceCount ?? 0) + 1;
-+      const id = this.getAttribute('id') || `strudel_editor_${StrudelRepl.instanceCount}`;
-       this.editor = new StrudelMirror({
-+        id,
-         defaultOutput: webaudioOutput,
-         getTime: () => getAudioContext().currentTime,
-         transpiler,
+   eq() {
+     return !1;
+@@ -44257,7 +44274,7 @@ class gR extends Pr {
+       const i = n.from + n.originalValue.length;
+       let o = { from: n.from, to: i, insert: a };
+       n.originalValue = a, n.value = a, this.view.dispatch({ changes: o });
+-      const l = jne(n.originalFrom);
++      const l = this.sliderID ?? jne(n.originalFrom);
+       window.postMessage({ type: "cm-slider", value: Number(r), id: l });
+     }), e;
+   }
+@@ -44269,8 +44286,8 @@ const I1 = Ke.define(), bR = (t, e) => {
+   t.dispatch({ effects: I1.of(e) });
+ };
+ function Bne(t, e) {
+-  return t.filter((n) => n.type === "slider").map(({ from: n, to: s, value: r, min: a, max: i, step: o }) => je.widget({
+-    widget: new gR(r, a, i, n, s, o, e),
++  return t.filter((n) => n.type === "slider").map((d) => ({ ...d, sliderID: getSliderID(d) })).map(({ from: n, to: s, value: r, min: a, max: i, step: o, sliderID: d }) => je.widget({
++    widget: new gR(r, a, i, n, s, o, e, d),
+     side: 0
+   }).range(
+     n
+@@ -46501,6 +46518,9 @@ function WR({ initialCode: t = "", onChange: e, onEvaluate: n, onStop: s, root:
+   });
+ }
+ class zR {
++  static instanceCount = 0;
++  instanceIdx = zR.instanceCount++;
++  soloStopping = !1;
+   constructor(e) {
+     const {
+       root: n,
+@@ -46515,21 +46535,21 @@ class zR {
+       solo: h = !0,
+       ...f
+     } = e;
+-    this.code = r, this.root = n, this.miniLocations = [], this.widgets = [], this.drawTime = o, this.drawContext = i, this.onDraw = a || this.draw, this.id = s || gre(), this.solo = h, this.drawer = new X6((w, C, S, E) => {
++    this.code = r, this.root = n, this.miniLocations = [], this.widgets = [], this.drawTime = o, this.drawContext = i, this.onDraw = a || this.draw, this.id = s || `strudel-mirror-${this.instanceIdx}`, this.solo = h, this.drawer = new X6((w, C, S, E) => {
+       const W = w.filter((R) => R.isActive(C));
+       this.highlight(W, C), this.onDraw(w, C, E);
+     }, o), this.prebaked = c(), l && this.drawFirstFrame(), this.repl = Q3({
+       ...f,
+-      id: s,
++      id: this.id,
+       onToggle: (w) => {
+         f?.onToggle?.(w), w ? (this.drawer.start(this.repl.scheduler), this.solo && document.dispatchEvent(
+           new CustomEvent("start-repl", {
+             detail: this.id
+           })
+-        )) : (this.drawer.stop(), _d(this.editor, []), sb(!0, s));
++        )) : (this.drawer.stop(), _d(this.editor, []), sb(!0, this.id, !this.soloStopping));
+       },
+       beforeEval: async () => {
+-        sb(!0, s), await this.prebaked, await f?.beforeEval?.();
++        sb(!0, this.id, !0), await this.prebaked, await f?.beforeEval?.();
+       },
+       afterEval: (w) => {
+         this.miniLocations = w.meta?.miniLocations, this.widgets = w.meta?.widgets;
+@@ -46553,8 +46573,8 @@ class zR {
+     const g = this.root.querySelector(".cm-editor");
+     g && (this.root.style.display = "block", u && (this.root.style.backgroundColor = "var(--background)"), g.style.backgroundColor = "transparent");
+     const v = so.get();
+-    this.setFontSize(v.fontSize), this.setFontFamily(v.fontFamily), this.onStartRepl = (w) => {
+-      this.solo && w.detail !== this.id && this.stop();
++    this.setFontSize(v.fontSize), this.setFontFamily(v.fontFamily), this.onStartRepl = async (w) => {
++      this.solo && w.detail !== this.id && (this.soloStopping = !0, await this.stop(), this.soloStopping = !1);
+     }, document.addEventListener("start-repl", this.onStartRepl), this.onEvaluateRequest = (w) => {
+       try {
+         kn("[repl] evaluate via event"), this.evaluate(), w?.cancelable && w.preventDefault?.();
