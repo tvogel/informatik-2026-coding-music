@@ -8,9 +8,10 @@ interface Props {
    * - `displayOnly`: only shows `tune`
    */
   mode?: "full" | "playOnly" | "displayOnly";
+  fade_s?: number;
 }
 
-const { name, tune = "", mode = "full" } = Astro.props;
+const { name, tune = "", mode = "full", fade_s = 0.125 } = Astro.props;
 const displayOnly = mode === "displayOnly";
 const playOnly = mode === "playOnly";
 const hasDefaultTune = tune.trim().length > 0;
@@ -27,6 +28,7 @@ const hasDefaultTune = tune.trim().length > 0;
     data-default-tune={tune}
     data-mini-repl-name={name}
     data-play-only={playOnly ? "" : undefined}
+    data-fade-s={fade_s}
   >
     {
       !displayOnly && (
@@ -114,16 +116,28 @@ const hasDefaultTune = tune.trim().length > 0;
    * superdough's output cuts them off; new notes reconnect on their own.
    * With `fade`, the output fades out first to avoid a click.
    */
-  const silence = (fade: boolean, stillSilent = () => true) => {
+  const silence = (fade_s: number, stillSilent = () => true) => {
     const controller = (globalThis as any).getSuperdoughAudioController?.();
     if (!controller) return;
-    if (!fade) return controller.reset();
+    if (!fade_s) return controller.reset();
     const { audioContext, output } = controller;
-    output.destinationGain?.gain.setTargetAtTime(0, audioContext.currentTime, 0.01);
-    setTimeout(() => {
-      if (stillSilent()) controller.reset();
-      else output.destinationGain?.gain.setTargetAtTime(1, audioContext.currentTime, 0.01);
-    }, 60);
+    output.destinationGain?.gain.setTargetAtTime(
+      0,
+      audioContext.currentTime,
+      fade_s,
+    );
+    setTimeout(
+      () => {
+        if (stillSilent()) controller.reset();
+        else
+          output.destinationGain?.gain.setTargetAtTime(
+            1,
+            audioContext.currentTime,
+            0.01,
+          );
+      },
+      1000 * fade_s * 6,
+    );
   };
 
   /**
@@ -182,7 +196,11 @@ const hasDefaultTune = tune.trim().length > 0;
       const EditorState = view.state.constructor;
       const compartment = view.state.config?.compartments?.keys().next().value;
       const StateEffect = compartment?.reconfigure([]).constructor;
-      if (StateEffect?.appendConfig && EditorState.readOnly && EditorView.editable) {
+      if (
+        StateEffect?.appendConfig &&
+        EditorState.readOnly &&
+        EditorView.editable
+      ) {
         view.dispatch({
           effects: StateEffect.appendConfig.of([
             EditorState.readOnly.of(true),
@@ -204,8 +222,9 @@ const hasDefaultTune = tune.trim().length > 0;
     const strudel = $.optional("strudel");
     const reference = $.optional("reference");
     const playOnly = root.dataset.playOnly !== undefined;
-
     const defaultTune = root.dataset.defaultTune ?? "";
+    const fade_s = parseFloat(root.dataset.fadeS ?? "0.125");
+
     const storageKey = makeStorageKey(
       "mini-repl",
       root,
@@ -297,13 +316,13 @@ const hasDefaultTune = tune.trim().length > 0;
         // Cuts notes still ringing from another editor. Not while this one
         // plays: re-evaluating continues the pattern where it is, so its
         // current notes would only be replaced at their next onset.
-        if (!started) silence(false);
+        if (!started) silence(0);
         repl!.editor?.evaluate();
       });
 
       $("stop").addEventListener("click", () => {
         repl!.editor?.stop();
-        silence(true, () => !started);
+        silence(fade_s, () => !started);
       });
 
       // Lets other components (e.g. BaseNote) apply changed code at once:
@@ -311,7 +330,7 @@ const hasDefaultTune = tune.trim().length > 0;
       // keep their old pitch until their next onset.
       repl.addEventListener("mini-repl:restart", () => {
         repl!.editor?.stop();
-        silence(false);
+        silence(fade_s);
         repl!.editor?.evaluate();
       });
 
