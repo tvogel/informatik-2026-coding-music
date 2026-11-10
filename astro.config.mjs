@@ -45,7 +45,7 @@ export default defineConfig({
               { label: 'Intervalle', slug: 'guides/intervals' },
             ]
           },
-          // { label: 'Harmonien', slug: 'guides/harmonies' },
+          { label: 'Harmonien', slug: 'guides/harmonies' },
         ],
       },
       {

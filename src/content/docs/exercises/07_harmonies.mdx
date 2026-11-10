@@ -1,0 +1,94 @@
+---
+title: "Übungen 7: Hitmaschinen"
+description: Für populäre Harmonien muss man sich nicht schämen!
+---
+import { LinkCard, LinkButton } from '@astrojs/starlight/components';
+import MiniRepl from "../../../components/MiniRepl.astro";
+import dedent from "dedent";
+import Checklist from "../../../components/Checklist.astro";
+import { YouTube } from 'astro-embed';
+
+## Four-Chord-Songs
+
+Bei den Four-Chord-Songs ist das "Geheimrezept": I - V - vi - IV
+
+Sucht Euch die passenden Akkorde zum Beispiel für Tonika C-Dur heraus und probiert, etwas damit zu arrangieren:
+
+<MiniRepl name="four_chord" tune={`$: chord("<C G Am F>")
+     .voicing()
+     .piano()
+     .gain(0.5)
+_$: n("<[0 1 2 3] [4 3 2 1] [7 6 5 7] [[0 1]*4]>")
+     .scale("c:major")
+     .s("gm_xylophone")
+`}/>
+
+:::tip
+Man kann die einzelnen Töne eines Akkordes getrennt bzw. mit einem Muster auswählen. Probiert mal:
+```
+n("[0@3 [1,2,3,4]] [1,2,3,4]*2").
+```
+*vor* dem `chord()`-Befehl!
+:::
+
+## Pachelbel: Kanon in D-Dur
+
+Ein Kanon aus dem 17. Jahrhundert hat eine Akkordfolge in die Welt gesetzt, die so einflussreich ist, wie vielleicht keine andere!
+
+<YouTube id="_PC6jwoHyOk" posterQuality="max"/>
+
+Hier der Original-Kanon:
+<MiniRepl name="pachelbel_original" tune={`$: chord("<D A Bm F#m G D G A>")
+     .voicing()
+     .piano()
+     .gain(0.5)
+$: n(\`<[11 [9 10]]*2
+         [11 4 5 6 7 8 9 10]
+         [9 [7 8] 9 [2 3]]
+         [4 5 4 3 4 2 3 4]
+         [3 [5 4] 3 [2 1]]
+         [2 1 0 1 2 3 4 5]
+         [3 [5 4] 5 [6 7]]
+         [4 5 6 7 8 9 10 11]>\`)
+     .scale("d:major")
+     .s("gm_xylophone")
+`}/>
+
+Und jetzt Ihr! Die Zauberformel ist: I - V - vi - iii - IV - I - IV - V
+
+<MiniRepl name="pachelbel_tune"/>
+
+## 50s-Chord-Progression
+
+<YouTube id="QCszO9qP8eM" />
+
+Probiert sie aus! I - vi - IV - V
+
+<MiniRepl name="50s"/>
+
+## Die Andalusische Kadenz
+
+<YouTube id="_g9r-zRcxI0" />
+
+Sie geht so: i - VII - VI - V
+
+<MiniRepl name="andalusian"/>
+
+## 12-Bar-Blues Chord Progression
+
+<YouTube id="p3Rifu3maGo" />
+
+Das Schema ist:
+| I  | I  | I | I |
+|----|----|---|---|
+| IV | IV | I | I |
+| V  | IV | I | I |
+
+<MiniRepl name="12-bar-blues"/>
+
+{/*
+## Weiter geht es mit *Harmonien*
+
+Das mit den ganzen Intervallen auszuprobieren ist ziemlich mühsam, aber gibt natürlich reichlich Raum für kreative Entdeckungen. Es gibt aber Abfolgen, an die wir ziemlich gewohnt sind und die auch Freude machen zu erkunden:
+
+<LinkButton icon='right-arrow' href="../../guides/harmonies/">Harmonien</LinkButton> */}

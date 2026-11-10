@@ -1,12 +1,248 @@
 ---
-title: Harmonien
+title: Akkorde und Harmonien
 description: Das Rad erfinden
 ---
-import { LinkCard, LinkButton } from "@astrojs/starlight/components";
+import { LinkCard, LinkButton, Card, CardGrid } from "@astrojs/starlight/components";
 import MiniRepl from "../../../components/MiniRepl.astro";
+import Flat from "../../../components/Flat.astro";
+import Quintenzirkel from '../../../assets/CircleOfKeys.svg';
+import { YouTube } from 'astro-embed';
 
-export const sound = "gm_synth_bass_2";
+Akkorde sind mehrere Töne, die gleichzeitig gespielt werden, um einen Gesamtklang zu erzeugen. Die wichtigsten Akkorde sind die Dreiklänge. Ähnlich wie die Tonleitern unterscheidet man zunächst Dur- und Molldreiklänge und garniert sie später noch mit zusätzlichen Tönen oder Veränderungen.
 
-## Zeit auszuprobieren
+### Dur-Dreiklang
 
-<LinkButton icon='right-arrow' href="../../exercises/06_intervals/">Übungen: Melodien mit Intervallen</LinkButton>
+Er besteht aus der Prim, der großen Terz und der Quinte. Der Abstand vom mittlere zum oberen Ton ist dann eine kleine Terz. Das lässt sich dank `.scale()` sehr einfach für alle Tonarten schreiben:
+
+<MiniRepl name="major_triad" tune={`\
+setcpm(80/4)
+$: n("[0,2,4]")
+     .struct("x!2 x@2")
+     .slow(2)
+     .scale('c4:major')
+     .piano()
+`}/>
+
+Der Dur-Dreiklang wird oft als strahlend, fröhlich empfunden.
+
+### Moll-Dreiklang
+
+Der Moll-Dreiklang ist fast gleich, nur dass in der Mitte die kleine Terz statt der großen Terz liegt. Der Abstand vom mittleren zum oberen Ton ist dann eine große Terz. Auch hier hilft uns `.scale()`: Wir nehmen einfach `minor` statt `major` für die Tonleiter und erhalten automatisch den entsprechenden Dreiklang.
+
+<MiniRepl name="minor_triad" tune={`\
+setcpm(80/4)
+$: n("[0,2,4]")
+     .struct("x!2 x@2")
+     .slow(2)
+     .scale('c4:minor')
+     .piano()
+`}/>
+
+Moll-Dreiklänge werden als weicher, melancholisch empfunden.
+
+### Dreiklänge in der Dur-Tonleiter
+
+Bisher hatten wir die Dreiklänge auf den Grundtönen der Tonleiter aufgebaut. Man kann das auch auf den anderen Tönen machen, indem man einfach jeden zweiten Ton darüber spielt. Man bezeichnet diese Akkorde in der Jazz- und Pop-Musik gerne mit römischen Zahlen, anfangend mit *I* für den Dreiklang über dem Grundton.
+
+<MiniRepl name="scale_triads" tune={`\
+setcpm(80/4)
+$: cat("[0,2,4]",  // I: C-Dur (C major)
+         "[1,3,5]",  // II: D-Moll (D minor)
+         "[2,4,6]",  // III: E-Moll (E minor)
+         "[3,5,7]",  // IV: F-Dur (F major)
+         "[4,6,8]",  // V: G-Dur (G major)
+         "[5,7,9]",  // VI: A-Moll (A minor)
+         "[6,8,10]", // VII: H vermindert (B diminished)
+         "[7,9,11]", // VIII: C-Dur (C major)
+      ).n()
+     .struct("[x!2 x@2]")
+     .scale('c4:major')
+     .piano()
+`}/>
+
+Ihr seht: Es entstehen mit den Tönen der C-Dur-Tonleiter sowohl Dur-, Moll- und sogar ein verminderter Dreiklang. Man schreibt das "Moll" als Erinnerung gern an das Akkord-Symbol dran oder in Kleinbuchstaben:
+
+| I | IIm | IIIm | IV | V | VIm | VIIm<Flat/>5 |
+|---|-----|------|----|---|-----|--------------|
+| I | ii  | iii  | IV | V | vi  | °vii         |
+
+Das *<Flat />5* bzw. das ° bezeichnet einen verminderten Dreiklang.
+
+### Dreiklänge in der Moll-Tonleiter
+
+In der Moll-Tonleiter gibt es folgende Dreiklänge (A-Moll, damit wir keine Vorzeichen brauchen):
+
+<MiniRepl name="scale_triads_minor" tune={`\
+setcpm(80/4)
+$: cat("[0,2,4]",  // I: A-Moll (A minor)
+         "[1,3,5]",  // II: H vermindert (B diminished)
+         "[2,4,6]",  // III: C-Dur (C major)
+         "[3,5,7]",  // IV: D-Moll (D minor)
+         "[4,6,8]",  // V: E-Moll (E minor)
+         "[5,7,9]",  // VI: F-Dur (F major)
+         "[6,8,10]", // VII: G-Dur (G major)
+         "[7,9,11]", // VIII: A-Moll (A minor)
+      ).n()
+     .struct("[x!2 x@2]")
+     .scale('a4:minor')
+     .piano()
+`}/>
+
+Hier gibt es also eine etwas andere Anordnung der Dreiklang-Typen:
+
+| Im | IIm<Flat/>5 | III | IVm | Vm | VI | VII |
+|----|-------------|-----|-----|----|----|-----|
+| i  | °ii         | III | iv  | v  | VI | VII |
+
+Das *<Flat />5* bzw. das ° bezeichnet wieder einen verminderten Dreiklang.
+
+### Tonika, Subdominante und Dominante
+
+Ihr seht, dass in beiden Fällen, Dur und Moll, die Dreiklänge über der I., VI. und V. Stufe die gleiche Bezeichnung, Dur oder Moll, hat wie die Tonleiter selbst. Das macht sie besonders naheliegend für den Aufbau von Harmonien und sie haben in der klassischen Musik besondere Namen, die häufig auftauchen, und die man daher gehört haben sollte:
+
+| Stufe  | Bezeichnung Dur           | Bezeichnung Moll          |
+|--------|---------------------------|---------------------------|
+| **I**  | **Tonika (T)**            | **Tonika (t)**            |
+| II     | Subdominantparallele (sp) | -                         |
+| III    | Dominantparallele (dp)    | Tonikaparallele (Tp)      |
+| **IV** | **Subdominante (S)**      | **Subdominante (s)**      |
+| **V**  | **Dominante (D)**         | **Dominante (d)**         |
+| VI     | Tonikaparallele (tp)      | Subdominantparallele (Sp) |
+| VII    | -                         | Dominantparallele (Dp)    |
+
+*Parallele* Dreiklänge entstehen, indem man vom Grundton eines Dur-Dreiklangs eine kleine Terz hinunter geht zum dortigen Moll-Dreiklang, oder vom Grundton eines Moll-Dreiklangs eine kleine Terz nach oben zum dortigen Dur-Dreiklang.
+
+### Der Quintenzirkel
+
+Es gibt noch eine Beobachtung, die wichtig für die Theorie der Harmonien ist:
+
+Die Subdominante ist (sowohl in Dur wie Moll) die Quarte über dem Grundton. Rechnet man in Halbtönen, liegt sie 5 Halbtöne über dem Grundton (siehe [Intervalle](../intervals/)). Zieht man davon eine Oktave, 12 Halbtöne, ab, so kommt man bei 7 Halbtönen unter dem Grundton heraus. Das ist genau eine Quinte unter dem Grundton. Quarten und Quinten sind also verwandt, wenn man die Töne über Oktaven hinweg als gleich behandelt.
+
+Wenn man von einem beliebigen Ton aus, z.B. C, immer weiter Quinten nach oben geht, stellt man fest, dass man irgendwann alle Töne erwischt hat, genau genommen nach 12 Tönen - so viele Halbtöne gibt es ja. Weil das einen Kreis bildet, kann man das im *Quintenzirkel* darstellen:
+
+<div style="display:flex; justify-content:center; ">
+<Quintenzirkel lang="de" width="30rem" alt="Der Quintenzirkel: Zwei Ringe aus je 12 Tonarten, angeordnet wie die Stunden einer Uhr. Im inneren Ring stehen die Dur-Tonarten in farbigen Kreisen, oben beginnend mit C und im Uhrzeigersinn jeweils eine Quinte höher: C, G, D, A, E, H, Fis bzw. Ges (unten), Des, As, Es, B, F – und dann wieder C. Im äußeren Ring steht direkt neben jeder Dur-Tonart ihre parallele Moll-Tonart (Kleinbuchstaben): a, e, h, fis bzw. ges, des, as, es, b, f, c, g, d. Zusätzlich sind die Akkordstufen bezogen auf C-Dur eingetragen: innen I bei C, IV bei F und V bei G, außen vi bei a, ii bei d und iii bei e."/>
+</div>
+Quelle: [Wikipedia](https://commons.wikimedia.org/wiki/File:CircleOfKeys.svg)
+
+Im Zirkel geht es im Uhrzeigersinn immer eine Quinte hoch. Innen stehen die Dur-Akkorde, außen die parallelen Moll-Akkorde.
+
+Man sieht also, dass die Tonika jeweils im Uhrzeigersinn die Dominante und gegen den Uhrzeigersinn die Subdominante als Nachbarn hat.
+
+:::tip
+Wer das häufiger braucht, freut sich über die beiden Merksprüche:
+
+**G**eh **D**u **A**lter **E**sel, **H**ol **Fis**che
+
+**F**rische **B**rötchen **Es**sen **As**sessoren **des** **Ges**angs
+:::
+
+## Harmonien
+
+Harmonien sind die Abfolge verschiedener Akkorde in einem Musikstück. Sie bestimmen den Grundcharakter und bilden das klangliche Fundament für die Melodien.
+
+Mit den Bezeichnungen für die verschiedenen Dreiklänge einer Tonleiter, die wir eben kennengelernt haben, lässt sich das innere Gefüge von Musik erstaunlich übersichtlich schreiben!
+
+### Die Hauptkadenz
+
+*Kadenz* heißt eigentlich (musikalischer) *Abschluss* (eines Stücks oder Abschnitts), wird aber heute allgemein für eine bestimmte Abfolge von Akkorden verwendet.
+
+Die sogenannte *Hauptkadenz* ist eine ganz typische Abfolge. Sie besteht aus den Akkorden über dem Grundton, der Quarte und der Quinte. Sie kommt in Dur- und in Molltonarten vor.
+
+#### Dur
+
+| Dur | I | IV | V | I |
+|-----|---|----|---|---|
+
+<MiniRepl name="main_cadence" tune={`\
+setcpm(80/4)
+$: cat("[0,2,4]", // I
+         "[3,5,7]", // IV
+         "[4,6,8]", // V
+         "[0,2,4]", // I
+         "~").n()
+     .struct("<[x*2]!3 x x>")
+     .scale('c4:major')
+     .piano()
+`}/>
+
+#### Moll
+
+In Molltonarten wird gerne die fünfte Stufe (Dominante) in Dur gespielt!
+Nehmt gerne mal das `#` weg und hört stattdessen den natürlichen Dominant-Moll-Dreiklang!
+
+| Moll | i | iv | V | i |
+|------|---|----|---|---|
+
+<MiniRepl name="main_cadence_minor" tune={`\
+setcpm(80/4)
+$: cat("[0,2,4]",  // i
+         "[3,5,7]",  // iv
+         "[4,6#,8]", // V
+         "[0,2,4]",  // i
+         "~").n()
+     .struct("<[x*2]!3 x x>")
+     .scale("a4:minor")
+     .piano()
+`}/>
+
+#### Umkehrungen
+
+Damit die IV. und V. Stufe nicht so "nach oben abhaut", gibt es die Möglichkeit, die obersten Töne um eine Oktave nach unten zu setzen (also 7 abzuziehen). Das macht man bei der IV. Stufe gerne mit dem obersten und bei der V. Stufe mit den beiden obersten Tönen. Das nennt man Stimmführung, englisch "voicing" und das klingt dann so:
+
+##### Dur
+
+<MiniRepl name="main_cadence_inversions" tune={`\
+setcpm(80/4)
+$: cat("[0,2,4]", // I
+         "[0,3,5]", // IV
+         "[-1,1,4]", // V
+         "[0,2,4]", // I
+         "~").n()
+     .struct("<[x*2]!3 x x>")
+     .scale('c4:major')
+     .piano()
+`}/>
+
+##### Moll
+
+<MiniRepl name="main_cadence_minor_inversions" tune={`\
+setcpm(80/4)
+$: cat("[0,2,4]",  // i
+         "[0,3,5]",  // iv
+         "[-1#,1,4]", // V
+         "[0,2,4]",  // i
+         "~").n()
+     .struct("<[x*2]!3 x x>")
+     .scale("a4:minor")
+     .piano()
+`}/>
+
+#### Harmonien mit Strudel
+
+Und jetzt kommt wieder der Moment, wo wir das musikalische Wissen nutzen, das in Strudel eingebaut ist. Man kann nämlich direkt die Akkorde angeben und Strudel sucht einem die passenden Noten für den Akkord zusammen. Dabei beachtet es auch die Stimmführung. Dafür muss man erst mittels des Quintenzirkels die Stufen in Akkorde verwandeln.
+
+<MiniRepl name="main_cadence_voicing" tune={`\
+setcpm(80/4)
+$: chord("<C F G C ~>")
+     .voicing()
+     .struct("<[x*2]!3 x x>")
+     .scale('c4:major')
+     .piano()
+`}/>
+
+
+## Hitmaschinen
+
+Es gibt eine handvoll Harmonien, die einen immensen Teil an bekannten Pop-Songs ausmachen. Schaut Euch einige davon an!
+
+### Four-Chord-Songs
+
+Bei den Four-Chord-Songs ist das "Geheimrezept": I - V - vi - IV
+
+Unglaublich, was damit in der Popmusik bereits alles gemacht wurde:
+<YouTube id="5pidokakU4I"/>
+
+
+
+<LinkButton icon='right-arrow' href="../../exercises/07_harmonies/">Übungen: Lernt typische Harmonien kennen und arrangiert Melodien!</LinkButton>
