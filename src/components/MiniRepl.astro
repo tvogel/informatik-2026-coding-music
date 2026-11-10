@@ -114,29 +114,36 @@ const hasDefaultTune = tune.trim().length > 0;
    * Stopping Strudel only stops scheduling: notes already playing ring out,
    * which takes a while with long notes (e.g. `.slow(4)`). Resetting
    * superdough's output cuts them off; new notes reconnect on their own.
-   * With `fade`, the output fades out first to avoid a click.
+   * With `fade_s`, the output fades out first to avoid a click. The promise
+   * resolves once the output is reset (or faded back in).
    */
-  const silence = (fade_s: number, stillSilent = () => true) => {
+  const silence = (fade_s: number, stillSilent = () => true): Promise<void> => {
     const controller = (globalThis as any).getSuperdoughAudioController?.();
-    if (!controller) return;
-    if (!fade_s) return controller.reset();
+    if (!controller) return Promise.resolve();
+    if (!fade_s) {
+      controller.reset();
+      return Promise.resolve();
+    }
     const { audioContext, output } = controller;
     output.destinationGain?.gain.setTargetAtTime(
       0,
       audioContext.currentTime,
       fade_s,
     );
-    setTimeout(
-      () => {
-        if (stillSilent()) controller.reset();
-        else
-          output.destinationGain?.gain.setTargetAtTime(
-            1,
-            audioContext.currentTime,
-            0.01,
-          );
-      },
-      1000 * fade_s * 6,
+    return new Promise((resolve) =>
+      setTimeout(
+        () => {
+          if (stillSilent()) controller.reset();
+          else
+            output.destinationGain?.gain.setTargetAtTime(
+              1,
+              audioContext.currentTime,
+              0.01,
+            );
+          resolve();
+        },
+        1000 * fade_s * 6,
+      ),
     );
   };
 
@@ -327,10 +334,11 @@ const hasDefaultTune = tune.trim().length > 0;
 
       // Lets other components (e.g. BaseNote) apply changed code at once:
       // re-evaluating would continue the pattern where it is, so long notes
-      // keep their old pitch until their next onset.
+      // keep their old pitch until their next onset. The new notes may only
+      // start after the reset, or it would cut them off, too.
       repl.addEventListener("mini-repl:restart", () => {
         repl!.editor?.stop();
-        silence(fade_s);
+        silence(0);
         repl!.editor?.evaluate();
       });
 
