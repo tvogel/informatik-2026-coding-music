@@ -81,11 +81,12 @@ const id = crypto.randomUUID();
       );
     };
 
-    function render() {
-      target.replaceChildren();
+    // Drawing in the text color lets the notes follow theme changes without
+    // a re-render. Firefox would print before such a re-render, i.e. with
+    // light notes on the light print theme.
+    const fgColor = "currentColor";
 
-      const style = window.getComputedStyle(document.body);
-      const fgColor = style.getPropertyValue("--sl-color-text") || "white";
+    function render() {
       factory.initRenderer();
 
       interface TvEasyScore extends VexFlow.EasyScore {
@@ -106,11 +107,6 @@ const id = crypto.randomUUID();
       factory.draw();
     }
 
-    const observer = new MutationObserver(render);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
     render();
   });
 </script>
