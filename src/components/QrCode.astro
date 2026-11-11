@@ -1,0 +1,30 @@
+---
+/* A QR code for `href`, rendered as SVG at build time. */
+import { renderSVG } from "uqr";
+
+interface Props {
+  href: string;
+  class?: string;
+}
+
+const { href, class: className } = Astro.props;
+// a quiet zone around the code helps scanners
+const svg = renderSVG(href, { border: 2 });
+---
+
+<span class:list={["qr", className]} set:html={svg} />
+
+<style>
+  .qr {
+    display: block;
+    flex: none;
+    width: 2.5cm;
+    height: 2.5cm;
+  }
+
+  .qr :global(svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+</style>

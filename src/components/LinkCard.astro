@@ -1,0 +1,65 @@
+---
+/*
+ * Starlight's LinkCard. Links to other sites print with a QR code and the
+ * URL next to the card.
+ */
+import { LinkCard as Card } from "@astrojs/starlight/components";
+import QrCode from "./QrCode.astro";
+
+type Props = Parameters<typeof Card>[0];
+
+const props = Astro.props;
+const href = String(props.href ?? "");
+const external = /^https?:\/\//.test(href);
+---
+
+{
+  external ? (
+    <div class="link-card">
+      <QrCode href={href} class="link-card__qr" />
+      <div class="link-card__body">
+        <Card {...props} />
+        <span class="link-card__url">{href}</span>
+      </div>
+    </div>
+  ) : (
+    <Card {...props} />
+  )
+}
+
+<style>
+  .link-card__url,
+  .link-card :global(.link-card__qr) {
+    display: none;
+  }
+
+  @media print {
+    .link-card {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      break-inside: avoid;
+    }
+
+    .link-card :global(.link-card__qr) {
+      display: block;
+    }
+
+    .link-card__body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .link-card__url {
+      display: block;
+      margin-top: 0.25rem;
+      font-size: var(--sl-text-sm);
+      overflow-wrap: anywhere;
+    }
+
+    /* the arrow means nothing on paper */
+    .link-card :global(.sl-link-card .icon) {
+      display: none;
+    }
+  }
+</style>
