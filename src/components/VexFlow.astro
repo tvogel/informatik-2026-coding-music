@@ -81,33 +81,24 @@ const id = crypto.randomUUID();
       );
     };
 
-    // Drawing in the text color lets the notes follow theme changes without
-    // a re-render. Firefox would print before such a re-render, i.e. with
-    // light notes on the light print theme.
-    const fgColor = "currentColor";
-
-    function render() {
-      factory.initRenderer();
-
-      interface TvEasyScore extends VexFlow.EasyScore {
-        lazyVoice: (notes: VexFlow.Tickable[]) => VexFlow.Voice;
-      }
-      const score = factory.EasyScore({
-        commitHooks: [commitHook],
-      }) as TvEasyScore;
-
-      score.lazyVoice = function (notes: VexFlow.Tickable[]) {
-        return this.voice([]).setStrict(false).addTickables(notes);
-      };
-
-      VexFlow.VexFlow.setFonts("Bravura");
-      func(VexFlow.VexFlow, factory, score);
-      setFgColor(factory, fgColor);
-      factory.getContext().scale(1.25, 1.25);
-      factory.draw();
+    interface TvEasyScore extends VexFlow.EasyScore {
+      lazyVoice: (notes: VexFlow.Tickable[]) => VexFlow.Voice;
     }
+    const score = factory.EasyScore({
+      commitHooks: [commitHook],
+    }) as TvEasyScore;
 
-    render();
+    score.lazyVoice = function (notes: VexFlow.Tickable[]) {
+      return this.voice([]).setStrict(false).addTickables(notes);
+    };
+
+    VexFlow.VexFlow.setFonts("Bravura");
+    func(VexFlow.VexFlow, factory, score);
+    // Drawing in the text color lets the notes follow the theme without a
+    // re-render, also when printing in the light theme.
+    setFgColor(factory, "currentColor");
+    factory.getContext().scale(1.25, 1.25);
+    factory.draw();
   });
 </script>
 
