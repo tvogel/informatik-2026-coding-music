@@ -8,6 +8,22 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
 ---
 
 <Default><slot /></Default>
+<script is:inline>
+  // Always print in the light theme, so that buttons etc. look right on
+  // paper. Everything (Starlight, VexFlow) follows `data-theme`.
+  (() => {
+    const root = document.documentElement;
+    let theme;
+    addEventListener("beforeprint", () => {
+      theme = root.dataset.theme;
+      root.dataset.theme = "light";
+    });
+    addEventListener("afterprint", () => {
+      if (theme === undefined) delete root.dataset.theme;
+      else root.dataset.theme = theme;
+    });
+  })();
+</script>
 <script>
   import * as Strudel from "@strudel/repl";
   await Strudel.prebake();
