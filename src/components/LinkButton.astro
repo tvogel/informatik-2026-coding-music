@@ -1,0 +1,72 @@
+---
+/*
+ * Starlight's LinkButton. Links to other sites print with a QR code and the
+ * URL next to the button.
+ */
+import { LinkButton as Button } from "@astrojs/starlight/components";
+import QrCode from "./QrCode.astro";
+
+type Props = Parameters<typeof Button>[0];
+
+const props = Astro.props;
+const href = String(props.href ?? "");
+const external = /^https?:\/\//.test(href);
+---
+
+{
+  external ? (
+    <span class="link-button">
+      <QrCode href={href} class="link-button__qr" />
+      <span class="link-button__body">
+        <Button {...props}>
+          <slot />
+        </Button>
+        <span class="link-button__url">{href}</span>
+      </span>
+    </span>
+  ) : (
+    <Button {...props}>
+      <slot />
+    </Button>
+  )
+}
+
+<style>
+  /* on screen, as if there were only the button */
+  .link-button,
+  .link-button__body {
+    display: contents;
+  }
+
+  .link-button__url,
+  .link-button :global(.link-button__qr) {
+    display: none;
+  }
+
+  @media print {
+    .link-button {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      break-inside: avoid;
+    }
+
+    .link-button :global(.link-button__qr) {
+      display: block;
+    }
+
+    .link-button__body {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+      min-width: 0;
+    }
+
+    .link-button__url {
+      display: block;
+      font-size: var(--sl-text-sm);
+      overflow-wrap: anywhere;
+    }
+  }
+</style>

@@ -2,7 +2,7 @@
 title: "Übungen 7: Hitmaschinen"
 description: Für populäre Harmonien muss man sich nicht schämen!
 ---
-import { LinkButton } from '@astrojs/starlight/components';
+import LinkButton from '../../../components/LinkButton.astro';
 import LinkCard from '../../../components/LinkCard.astro';
 import MiniRepl from "../../../components/MiniRepl.astro";
 import dedent from "dedent";
@@ -36,7 +36,7 @@ n("[0@3 [1,2,3,4]] [1,2,3,4]*2").
 
 Ein Kanon aus dem 17. Jahrhundert hat eine Akkordfolge in die Welt gesetzt, die so einflussreich ist, wie vielleicht keine andere!
 
-<YouTube id="_PC6jwoHyOk" posterQuality="max"/>
+<YouTube id="_PC6jwoHyOk" posterQuality="max" title="21 Songs that use Pachelbel's Canon chord progression" />
 
 Hier der Original-Kanon:
 <MiniRepl name="pachelbel_original" tune={`$: chord("<D A Bm F#m G D G A>")
@@ -61,7 +61,7 @@ Und jetzt Ihr! Die Zauberformel ist: I - V - vi - iii - IV - I - IV - V
 
 ## 50s-Chord-Progression
 
-<YouTube id="QCszO9qP8eM" />
+<YouTube id="QCszO9qP8eM" title="Songs that use the 50s chord progression"/>
 
 Probiert sie aus! I - vi - IV - V
 
@@ -69,7 +69,7 @@ Probiert sie aus! I - vi - IV - V
 
 ## Die Andalusische Kadenz
 
-<YouTube id="_g9r-zRcxI0" />
+<YouTube id="_g9r-zRcxI0" title="Songs that use the Andalusian Cadence"/>
 
 Sie geht so: i - VII - VI - V
 
@@ -77,7 +77,7 @@ Sie geht so: i - VII - VI - V
 
 ## 12-Bar-Blues Chord Progression
 
-<YouTube id="p3Rifu3maGo" />
+<YouTube id="p3Rifu3maGo" title="Songs using ther 12-bar blues chord progression"/>
 
 Das Schema ist:
 | I  | I  | I | I |
