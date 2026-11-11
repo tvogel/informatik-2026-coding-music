@@ -502,4 +502,21 @@ const hasDefaultTune = tune.trim().length > 0;
       overflow-x: auto;
     }
   }
+
+  /* with an original tune next to the editor, only the original is printed */
+  @media print {
+    .root:has(.code-pane) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .root:has(.code-pane) .editor-pane,
+    .code-pane__reset {
+      display: none;
+    }
+
+    .code-pane {
+      grid-column: 1;
+      padding-top: 0;
+    }
+  }
 </style>
