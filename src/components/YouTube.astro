@@ -1,7 +1,7 @@
 ---
 /*
- * astro-embed's YouTube embed, which prints as a small placeholder with the
- * link and a QR code instead of an empty box.
+ * astro-embed's YouTube embed, which prints as a small placeholder like a
+ * LinkCard, with a QR code and the link, instead of an empty box.
  */
 import { YouTube as Embed } from "astro-embed";
 import QrCode from "./QrCode.astro";
@@ -16,13 +16,15 @@ const href = `https://youtu.be/${props.id}`;
   <div class="youtube__screen">
     <Embed {...props} />
   </div>
-  <a class="youtube__print not-content" href={href}>
+  <div class="youtube__print not-content">
     <QrCode href={href} />
-    <span class="youtube__text">
-      <strong>Video{props.title && `: ${props.title}`}</strong>
-      <span>{href}</span>
-    </span>
-  </a>
+    <div class="youtube__body">
+      <a class="youtube__card" href={href}>
+        Video{props.title && `: ${props.title}`}
+      </a>
+      <span class="youtube__url">{href}</span>
+    </div>
+  </div>
 </div>
 
 <style>
@@ -35,23 +37,36 @@ const href = `https://youtu.be/${props.id}`;
       display: none;
     }
 
+    /* as in LinkCard */
     .youtube__print {
       display: flex;
       gap: 1rem;
       align-items: center;
-      width: fit-content;
-      padding: 0.25rem 1rem 0.25rem 0.25rem;
-      border: 1px solid currentColor;
-      border-radius: 0.25rem;
       break-inside: avoid;
-      color: inherit;
+    }
+
+    .youtube__body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .youtube__card {
+      display: block;
+      padding: 1rem;
+      border: 1px solid var(--sl-color-gray-5);
+      border-radius: 0.5rem;
+      color: var(--sl-color-white);
+      font-size: var(--sl-text-lg);
+      font-weight: 600;
+      line-height: var(--sl-line-height-headings);
       text-decoration: none;
     }
 
-    .youtube__text {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
+    .youtube__url {
+      display: block;
+      margin-top: 0.25rem;
+      font-size: var(--sl-text-sm);
+      overflow-wrap: anywhere;
     }
   }
 </style>
