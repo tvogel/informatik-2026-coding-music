@@ -1,0 +1,71 @@
+---
+/*
+ * astro-embed's YouTube embed, which prints as a small placeholder with the
+ * link and a QR code instead of an empty box.
+ */
+import { YouTube as Embed } from "astro-embed";
+import { renderSVG } from "uqr";
+
+type Props = Parameters<typeof Embed>[0];
+
+const props = Astro.props;
+const href = `https://youtu.be/${props.id}`;
+// a quiet zone around the code helps scanners
+const qr = renderSVG(href, { border: 2 });
+---
+
+<div class="youtube">
+  <div class="youtube__screen">
+    <Embed {...props} />
+  </div>
+  <a class="youtube__print not-content" href={href}>
+    <span class="youtube__qr" set:html={qr} />
+    <span class="youtube__text">
+      <strong>Video{props.title && `: ${props.title}`}</strong>
+      <span>{href}</span>
+    </span>
+  </a>
+</div>
+
+<style>
+  .youtube__print {
+    display: none;
+  }
+
+  @media print {
+    .youtube__screen {
+      display: none;
+    }
+
+    .youtube__print {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      width: fit-content;
+      padding: 0.25rem 1rem 0.25rem 0.25rem;
+      border: 1px solid currentColor;
+      border-radius: 0.25rem;
+      break-inside: avoid;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .youtube__qr {
+      flex: none;
+      width: 2.5cm;
+      height: 2.5cm;
+    }
+
+    .youtube__qr :global(svg) {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .youtube__text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+  }
+</style>
