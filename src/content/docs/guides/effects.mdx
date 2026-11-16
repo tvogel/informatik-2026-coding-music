@@ -1,0 +1,392 @@
+---
+title: Effekte
+description: Klänge verändern
+---
+import { Card, CardGrid } from "@astrojs/starlight/components";
+import LinkButton from "../../../components/LinkButton.astro";
+import LinkCard from "../../../components/LinkCard.astro";
+import MiniRepl from "../../../components/MiniRepl.astro";
+import YouTube from "../../../components/YouTube.astro";
+import ADSR from "../../../assets/ADSR_parameter.svg";
+
+Ob ein Stück flach klingt oder schafft, einen zu faszinieren, hängt nicht zuletzt davon ab, wie der Klangeindruck ist. Es gibt eine Vielzahl von Möglichkeiten, das mit Effekten zu beeinflussen. Manche Effekte wirken auf die einzelnen Töne, manche Effekte verändern den Gesamtklang.
+
+## Effekte für den Gesamtklang
+
+Man kann die Effekte für den Gesamtklang grob in vier Kategorien einteilen:
+
+- Raumklang: Diese Effekte simulieren digital, wie sich Klang im Raum ausbreitet. Dazu gehören Hall und Echo, die sich physikalisch daraus ergeben, wie der Schall mit der Umgebung interagiert und nach Reflexion im Ohr ankommt. Wesentlich dafür ist die Größe des Raums und die Oberflächenbeschaffenheit.
+- Frequenzveränderung: Durch elektronische Schaltkreise, aber auch durch physikalische Gegebenheiten werden unterschiedliche Tonhöhe unterschiedlich stark weitergeleitet, z.B. dringen durch eine geschlossene Tür die tiefen Töne wesentlich besser heraus als die hohen. Dadurch kann man charakteristische Effekte erzielen.
+- Phasenveränderungen: Manche Effekte lassen die verschiedenen Frequenzen gleich laut, aber verzögern Teile des Klangs und mischen das dem Klang wieder hinzu, was zu Interferenzen und charakteristischen Veränderungen führt.
+- Verzerrungen des Klangs: Verschiedene Effekte, die bei der Verarbeitung von Klang auftreten und eigentlich die Klangqualität verschlechtern, werden bewusst verwendet, um einem bestimmten Sound zu erreichen.
+
+In diesem Video bekommt Ihr einen umfassenden Überblick:
+
+<YouTube id="RivJSE_V0EE" posterQuality="max" title="Sarah Feldman: Everything You Need to Know About Audio Effects Explained" />
+
+### Reverb
+
+Mit dem Reverb bzw. Hall definiert Ihr einen Raum, dessen Klang zu Eurer Tonspur hinzugefügt wird. Das sind die wesentlichen Parameter und ihre Auswirkung:
+
+<MiniRepl name="reverb" tune={`$: s("clap:6")
+     .gain(4)
+     .room(0.5)    // Stärke
+     .roomsize(1)  // Größe (zwischen 0 und 10)
+     .roomfade(.2) // Schwellzeit (in Sekunden)
+     .roomlp(2000) // Tiefpass: Anfangsfrequenz in Hz (siehe unten)
+     .roomdim(500) // Tiefpass: Endfrequenz in Hz
+`}/>
+
+Die Klangcharakteristik eines Raumes kann man besonders gut mit einem Klatschen (oder Pistolenschuss) bestimmen, weil ein Knall einen sehr großen Frequenzumfang hat und einen exakt definierten Moment.
+
+Tatsächlich kann man mit der Tonaufnahme von einem Knall in einem Raum rechnerisch bestimmen, wie sich andere Töne in diesem Raum anhören! So eine Tonaufnahme nennt man *Impulsantwort*. (Mathematisch verwendet man zur Berechnung eine *Faltung*.)
+
+### Delay
+
+Der Delay-Effekt fügt dem Ton eine verzögerte Fassung des Tons hinzu. Das klingt wie ein Echo und geht so:
+
+<MiniRepl name="delay" tune={`$: s("clap:6")
+     .gain(4)
+     .delay(0.5)         // Stärke
+     .delaytime(.3)      // Verzögerung (in Sekunden)
+     .delayfeedback(0.2) // Rückkopplung (zwischen 0 und 1)
+`}/>
+
+### Hilfsmittel: `slider()`
+
+Überall, wo Ihr in Strudel eine Zahl eingeben könnt, könnt Ihr einen `slider()` verwenden. Er hat drei Parameter:
+
+```js
+slider(current, min, max)
+```
+
+Dabei gibt `current` den aktuellen Wert, `min` den minimalen und `max` den maximalen Wert an. Man kann auch noch einen vierten Parameter angeben - das wäre `step`, die Schrittweite.
+
+Mit einem Slider lassen sich Parameter für Effekte gut ausprobieren.
+
+### Tiefpass
+
+Tief-, Hoch- und Bandpass sind Frequenzfilter. Ihr Name gibt an, welche Anteile durch den Filter durchkommen, andere Frequenzen werden herausgefiltert bzw. stark abgeschwächt.
+
+Der Tiefpass lässt also Frequenzen durch, die niedriger als eine Schwelle sind und schneidet höhere Tone weg. Der Klang wird dumpfer.
+
+:::caution
+Manche Parameter können plötzliche Lautstärke-Veränderungen hervorrufen. In diesem Fall der Resonanz-Faktor. Seid vorsichtig, dreht die Lautstärke runter, damit Ihr Euch nicht durch zu hohe Lautstärke verletzt! Obwohl man mit dem Faktor auf 50 gehen kann, habe ich ihn hier auf 25 begrenzt.
+:::
+
+In Strudel hat ein Tiefpass folgende Parameter:
+
+<MiniRepl name="lp" tune={`$: chord("<Cm Fm G [Eb Fm]>").voicing().arp("[0 1 2 3]*4").s("supersaw")
+     .lpf(slider(4000, 30, 4000)) // Cutoff-Frequenz (in Hz)
+     .lpq(slider(0, 0, 25))        // Resonanz-Faktor (0 bis 50)
+     ._spectrum()
+`}/>
+
+:::tip
+Der *Resonanz-* oder *Q*-Faktor erzeugt eine Resonanz im Bereich der Cutoff-Frequenz, d.h. Frequenzen dort werden verstärkt. Das erzeugt einen speziellen Klang. Höhere Frequenzen werden immer noch abgeschnitten, so dass der Verlauf des Filters dort sehr steil wird.
+:::
+
+### Hochpass
+
+Der Hochpass arbeitet umgekehrt: Höhere Frequenzen kommen durch, niedrige werden unterdrückt. Der Klang wird heller.
+
+<MiniRepl name="hp" tune={`$: chord("<Cm Fm G [Eb Fm]>").voicing().arp("[0 1 2 3]*4").s("supersaw")
+     .hpf(slider(4000, 30, 4000)) // Cutoff-Frequenz (in Hz)
+     .hpq(slider(0, 0, 25))        // Resonanz-Faktor (0 bis 50)
+     ._spectrum()
+`}/>
+
+
+### Bandpass
+
+Der Bandpass lässt nur ein *Frequenzband* um die genannte Frequenz herum durch. Hier definiert der Resonanz-Faktor die Breite des durchgelassenen Frequenzbandes. Je höher der Faktor, um so schmaler ist das Band. Bei Null wird alles durchgelassen.
+
+<MiniRepl name="bp" tune={`$: chord("<Cm Fm G [Eb Fm]>").voicing().arp("[0 1 2 3]*4").s("supersaw")
+     .bpf(slider(2000, 30, 4000)) // zentrale Frequenz (in Hz)
+     .bpq(slider(10, 0, 50))      // Resonanz-Faktor (0 bis 50)
+     ._spectrum()
+`}/>
+
+
+### Vokal-Filter
+
+Die Vokale der menschlichen Sprache funktionieren auch wie ein Frequenzfilter: Unsere Stimmbänder produzieren einen Ton, der je nach Stellung von Zunge, Gaumen, Lippen und Kiefergelenk unterschiedlich gefiltert wird. An dieser Frequenzzusammensetzung erkennen wir dann A, Ä, E, I, O, Ö, Ü und U. Strudel kann das nachstellen:
+
+<MiniRepl name="vowel" tune={`$: chord("<Cm Fm G [Eb Fm]>").anchor("a4").voicing().s("supersaw")
+     .vowel("<a ae e i o oe ue u>/2")
+     ._spectrum()
+`}/>
+
+
+### Gain
+Gain bestimmt die Vorverstärkung, also wie der vom Instrument erzeugte Klang verstärkt oder abgeschwächt wird, *bevor* die anderen Effekte auf den Klang wirken. Diesen Befehl habt Ihr bei den Ghost Notes oder den zufälligen Veränderungen schon gesehen:
+
+<MiniRepl name="gain" tune={`$: chord("<Cm Fm G [Eb Fm]>").voicing()
+     .arp("[0 1 2 3]*4").s("supersaw")
+     .gain("[1 0.4 0.7 0.2]*4") // > 1: lauter, < 1: leiser
+     ._spectrum()
+`}/>
+
+
+### Kompressor
+
+Ein Kompressor verfolgt die Lautstärke einer Klangspur über die Zeit. Ist der Klang über einer gewissen Schwelle, so wird der Klang leiser gemacht. Ist der Klang dann wieder leiser, wird die Abschwächung wieder aufgehoben. Die Parameter des Kompressors werden durch `:` getrennt hintereinander geschrieben:
+
+```js
+.compressor("threshold:ratio:knee:attack:release")
+```
+
+| Parameter | Bedeutung |
+|-----------|-----------|
+| threshold | Schwelle in dB (Dezibel, siehe unten), ab der abgeschwächt wird. |
+| ratio     | Abschwächung: um welchen Faktor über der Schwelle abgeschwächt wird, z.B. 10 für 10:1 (zwischen 1 und 20)|
+| knee      | Breite der Übergangszone in dB ab der Schwelle: 0 heißt abrupt abschwächen, > 0 heißt langsamer übergehen (zwischen 0 und 40)|
+| attack    | Anstiegszeit in Sekunden für 10 dB Abschwächung (zwischen 0 und 1) |
+| release   | Abklingzeit in Sekunden für 10 dB Abschwächung (zwischen 0 und 1) |
+
+<MiniRepl name="compressor" tune={`$: s("bd hh!7").n(1)
+     .compressor("-40:<1 20>:20:0.0:0.01")
+     ._spectrum()
+`}/>
+
+
+:::tip[Exkurs]
+Dezibel ist eine *logarithmische* Skala für Lautstärken. So wie Dezimeter sich auf den Meter bezieht, bezieht sich ein Dezibel auf das Bel als Einheit. Ein Bel bedeutet eine Verzehnfachung. Eine Tabelle macht das Prinzip vielleicht klarer:
+
+| Dezibel | Bedeutung             |
+|---------|-----------------------|
+|  30     | 1000 mal so laut      |
+|  20     | 100 mal so laut       |
+|  10     | 10 mal so laut        |
+|  6      | knapp 4x so laut      |
+|  3      | knapp 2x so laut      |
+|  0      | gleich laut           |
+| -3      | knapp halb so laut    |
+| -6      | knapp viertel so laut |
+| -10     | 0,1 mal so laut       |
+| -20     | 0,01 mal so laut      |
+| -30     | 0,001 mal so laut     |
+
+:::
+
+### Panning
+
+Panning kommt vom *Panoramaregler*. Er bestimmt für einen Kanal, wie er auf linken und rechten Kanal verteilt wird. In Strudel bedeutet Null links und Eins rechts:
+
+<MiniRepl name="pan" tune={`$: chord("<Cm Fm G [Eb Fm]>").voicing()
+     .arp("[0 1 2 3]*4").s("supersaw")
+     .pan(slider(0.5, 0, 1))
+`}/>
+
+<MiniRepl name="pan_tune" tune={`$: chord("<Cm Fm G [Eb Fm]>").voicing()
+     .arp("[0 1 2 3]*4").s("supersaw")
+     .pan("[0 0.75 0.5 1]*4")
+     .room(slider(0, 0, 0.5))
+     .roomsize(1.5)
+`}/>
+
+:::tip
+Extremes Stereo, bei dem ein Klang nur auf einem Ohr zu hören ist, wird oft als anstrengend empfunden, was zu *Hörmüdigkeit* führen kann. Dann empfiehlt es sich, den Effekt durch einen leichten Reverb abzumildern. Durch den Raumklang kommt auch etwas Klang vom rechten Kanal im linken Ohr an und umgekehrt.
+:::
+
+### Tremolo
+
+Tremolo bedeutet ein rasches An- und Abschwellen der Lautstärke. Es geht so:
+
+<MiniRepl name="tremolo" tune={`$: chord("<Cm Fm G [Eb Fm]>").anchor("a4").voicing().s("supersaw")
+     .tremolo(slider(10, 1, 10))      // Frequenz in Hz
+     //.tremolosync(8)                // Frequenz in Anzahl pro Zyklus
+     .tremolodepth(slider(0.5, 0, 1)) // Intensität (0 bis 1)
+     .tremoloskew(slider(0.5, 0, 1))  // Schräglage (0 bis 1)
+     .tremolophase(slider(0, 0, 1))   // Phasenlage (0 bis 1)
+     .tremoloshape("sine")            // Form: tri/square/sine/saw/ramp
+     ._spectrum()
+`}/>
+
+
+### Phaser
+
+Ein Phaser wird oft bei E-Gitarren verwendet und hat einen charakteristischen Klang:
+
+<MiniRepl name="phaser" tune={`setcpm(100/4)
+$: chord("<Cm Fm G [Eb Fm]>").anchor("g4").voicing()
+     .s("gm_electric_guitar_clean")
+     .phaser(slider(1, 0, 5))               // Geschwindigkeit in Hz
+     .phaserdepth(slider(0.75, 0, 1))       // Intensität (0 bis 1)
+     .phasercenter(slider(1000, 100, 2000)) // Mittelfrequenz in Hz
+     .phasersweep(slider(2000, 0, 4000))    // Schwankungsbreite in Hz
+`}/>
+
+### Speed
+
+Mit Speed kann man Töne, die auf kurzen Aufnahmen (Samples) basieren schneller oder langsamer abspielen oder sogar rückwärts abspielen. Schneller abgespielte Samples klingen automatisch höher!
+
+<MiniRepl name="speed" tune={`n("3 2 1 0").s("numbers").speed("<1 2 -1>").slow(6)
+`}/>
+
+### Downsampling
+
+Kommende Woche schauen wir uns Sampling noch genauer an. Der Computer speichert ein Tonsignal typischerweise 48.000 mal pro Sekunde, um den Klang gut wiedergeben zu können. Mit diesem Effekt kann man das herunterrechnen lassen, um bewusst einen schlechteren Klang zu erzeugen.
+
+<MiniRepl name="coarse" tune={`note("c d e f").piano().coarse("<1 2 4 8 16 32>")`}/>
+
+Beim Faktor `32` sind es nur noch 1.500 Messungen pro Sekunde.
+
+### Post-Gain
+Für manche Effekte macht es einen wesentlichen Unterschied, welche Lautstärke der Eingangsklang hat, besonders für Verzerrer und Bitcrusher. Daher dreht man manchmal den Gain hoch, um einen bestimmten Effekt zu erzielen. Um dann aber am Ende wieder die beabsichtigte Lautstärke zu bekommen, kann man Post-Gain einsetzen. Post-Gain wird nach den Effekten angewandt. Das sehen wir im Beispiel für `.crush()`.
+
+### Bit-Crushing
+
+Typischerweise werden die Messwerte von Tonsignalen im Computer mit binären Zahlen dargestellt, die maximal 16 Stellen (Bits) haben. Mit dem Bit-Crusher kann man das künstlich herabsetzen. Während es bei 16 Bit 65.536 verschiedene Messerte gibt, gibt es bei 4 Bit nur noch 16 mögliche Messwerte. Das hört man deutlich:
+
+<MiniRepl name="crush" tune={`const gain = 2
+  note("c d e f").piano()
+    .gain(gain)
+    .crush("<16 8 7 6 5 4 3 2 1>")
+    .postgain(1/gain)`}/>
+
+
+### Verzerrung
+
+Verzerrung war ursprünglich ein unerwünschtes Fehlverhalten von Verstärkern, wenn sie zu laut aufgedreht wurden. Die entstehenden Klänge wurden aber rasch als kreatives Element entdeckt und prägen ganze Musikgenres.
+
+Man kann das Verhalten der überlasteten elektronischen Bauelement heute im Computer rechnerisch nachbilden.
+
+:::caution
+Verzerrer-Effekte können leicht erhebliche Lautstärken entwickeln. Seid bitte vorsichtig mit den Einstellungen, stellt z.B. `distorvol()` am Regler erst runter, bevor Ihr `distort()` erhöht!
+:::
+
+<MiniRepl name="distort" tune={`setcpm(100/4)
+$: chord("<Cm Fm G [Eb Fm]>").anchor("g4").voicing()
+     .s("gm_electric_guitar_clean")
+     .distort(slider(2.5, 0, 10))     // Intensität
+     .distortvol(slider(0.1, 0, 0.2)) // nachfolgende Verstärkung (typischerweise < 1)
+     .distorttype("diode")            // Typ: fold/chebyshev/scurve/diode/asym/sinefold
+`}/>
+
+
+### Signale
+
+Wo Zahlen als Parameter verwendet werden, oder `slider()` in den Beispielen, kann man auch sogenannte Signale verwenden. Sie verändern sich (meist) kontinuierlich und periodische während eines Zyklus. Sie unterscheiden sich in ihrer Form:
+
+| Signal | Beschreibung |
+|--------|--------------|
+| saw    | Sägezahn: Springt nach oben und fällt dann linear ab |
+| sine   | Sinus-Kurve, die zwischen 0 und 1 schwingt |
+| cosine | Cosinus-Kurve, die zwischen 0 und 1 schwingt |
+| tri    | Dreiecks-Kurve, die zwischen 0 und 1 schwingt |
+| square | Rechtecks-Kurve, die zwischen 0 und 1 springt |
+| rand   | Zufällige Werte zwischen 0 und 1 |
+| saw2, sine2, cosine2, tri2, square2, rand2 | wie ihre gleichnamigen Signale, aber bewegen sich zwischen -1 und 1 |
+| perlin | spezielle Form von Zufallszahlen - klingen anders, zwischen 0 und 1 |
+| irand(n) | zufällige ganze Zahlen zwischen 0 und n-1 |
+| brand | zufällige binäre Zahlen, also 0 oder 1 |
+| brandBy(p) | zufällige binäre Zahlen, Wahrscheinlichkeit für 1 ist p |
+| time | aktuelle Zykluszeit |
+| mouseX | aktuelle horizontale Mausposition zwischen 0 und 1 |
+| mouseY | aktuelle vertikale Mausposition zwischen 0 und 1 |
+
+Alle diese Signale kann man umskalieren auf einen anderen Bereich, indem man `.range(min, max)` anhängt. Dann gehen sie statt von 0 bis 1 von *min* bis *max*.
+
+### Ducking
+
+Ducking kennt Ihr schon aus Switch Angel's Video in der ersten Stunde. Das ist der Effekt, der dazu führt, dass die anderen Klänge zurückweichen, wenn die Bass-Drum spielt. Das gibt einen pumpenden Effekt für das ganze Stück.
+
+Da beim Ducking die Lautstärke von einer Spur andere Spuren beeinflussen soll, muss man sie zuordnen. Das funktioniert bei Strudel über sogenannte *Orbits*. Zunächst ordnet man die Spuren, die geduckt werden sollen mit dem `.orbit(n)` Befehl dem Orbit *n* zu. Dann kann man mit einer Reihe von Befehlen bestimmen, wie ein Track diese Orbits beeinflusst:
+
+<MiniRepl name="ducking" tune={`$: s("bd [~ bd] [~ bd] ~").n(6)
+     .duckorbit("2:3").duckdepth(0.8).duckattack(0.02)
+  $: s("~ sd ~ sd").n(6)
+  $: s("hh*8").n(6).gain(rand).rib(4,2).orbit(2)
+  const chords = chord("<G F <Am Em> <C [C Dm]>>")
+  $: chords.anchor("<c5 c5 <c5 a5> <c5 a5>>").voicing()
+     .s("gm_epiano2").orbit(3)
+     .room(.3).roomsize(1)
+     .pan(0.75).gain(0.7)
+  $: n("0 [~ 1] [~ 0] 1").set(chords).voicing().transpose(-12)
+     .s("gm_synth_bass_2")
+     .orbit(3)
+     .pan(0.25)`}/>
+
+## Effekte für Instrumente
+
+Die Effekte bis jetzt kümmern sich nicht darum, wann Noten angespielt werden. Sie verwenden einfach das Tonsignal, das dabei herauskommt und verarbeiten es weiter. Bei den Effekten in diesem Abschnitt ist das anders. Sie bestimmen bestimmte Parameter des Tons abhängig davon, wann der Ton angeschlagen wurde und wann er endet.
+
+### Hüllkurven
+
+Mit Hüllkurven wird der Verlauf verschiedener Eigenschaften wie Lautstärke, Tonhöhe oder auch Filtereinstellungen synchron mit dem Abspielen eines Tons gesteuert. Es hat sich eine verhältnismäßig einfache Form etabliert, die durch vier Parameter bestimmt wird. Drei Zeiten, *A*, *D*, *R* und eine Amplitude *S*:
+
+<ADSR style="width: min(100%, 50em, calc(8lh * 1100 / 600))" />
+Quelle: <a href="//commons.wikimedia.org/wiki/User:Abdull" title="User:Abdull">Abdull</a>, <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative Commons Attribution-Share Alike 3.0">CC BY-SA 3.0</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=1729613">Link</a>, von mir verbessert und für Dark/Bright-Mode angepasst
+
+Die Buchstaben stehen für:
+
+- Attack (Schwellzeit): Sie gibt an, wie lange es dauert vom Moment, dass der Ton beginnt, bis der Wert auf voller Höhe ist. Oft ist diese Zeit sehr kurz, aber manche Instrumente brauchen kurz Zeit bis sie klingen (z.B. Orgeln)
+- Decay (Abklingzeit): Oft nimmt der Ton nach dem Anschlag recht schnell an Lautstärke ab, bevor er für eine Weile recht gleich bleibt. Das kann z.B. beim kräftigen Anblasen einer Flöte oder beim Klavier gut beobachtet werden.
+- Sustain (Haltewert): Der Wert, auf dem die Hüllkurve bleibt, so lange der Ton klingt. Manche Instrumente, z.B. eine Triangel, haben einen Sustain von Null. Streicher oder ein Klavier haben aber einen lang anhaltenden Ton.
+- Release (Nachklingzeit): Die Zeit, während der der Ton noch nachklingt.
+
+#### Lautstärke
+
+In Strudel können solche ADSR-Hüllkurven für unterschiedliche Parameter verwendet werden, um den Klang anzupassen. Die wichtigste Anwendung ist die Lautstärke:
+
+<MiniRepl name="adsr_long" tune={`$: note("a4 ~")
+     .attack(0.2)
+     .decay(0.1)
+     .sustain(0.2)
+     .release(0.5)
+`}/>
+
+Oder kompakt (und mit Muster):
+<MiniRepl name="adsr" tune={`$: note("a4 ~")
+     .adsr("<0 0.1 0.2>:0.1:0.1:0.5")
+`}/>
+
+#### Tonhöhe
+
+Ähnlich lässt sich die Tonhöhe modulieren - allerdings funktionieren hier `release` und `decay` nicht zusammen. Und Sustain ist immer die echte Tonhöhe, daher gibt es keinen *S*-Parameter.
+
+<MiniRepl name="pitch_ad" tune={`$: note("a4 ~")
+     .pattack(0.2) // Anstiegszeit in Sekunden
+     .pdecay(0.1)  // Abklingzeit in Sekunden
+     .penv(3)      // Stärke in Halbtönen (+/-)
+     .pcurve(0)    // Kurventyp: 0: linear, 1: exponentiell
+     .panchor(0)   // 0: note -> note + penv -> note
+                   // 0.5: note - 0.5 * penv -> note + 0.5 * penv -> note - 0.5 * penv
+                   // 1: note - penv -> note -> note - penv
+`}/>
+
+<MiniRepl name="pitch_ar" tune={`$: note("a4 ~")
+     .pattack(0.2)  // Anstiegszeit in Sekunden
+     .release(0.5)  // Nachklingzeit (Lautstärke) in Sekunden
+     .prelease(0.5) // Nachlingzeit (Tonhöhe) in Sekunden
+     .penv(1)       // Stärke in Halbtönen
+     .pcurve(0)     // Kurventyp: 0: linear, 1: exponentiell
+`}/>
+
+#### Filter
+
+Auch die Tiefpass, Hochpass und Bandpass-Filter kann man mit einer Hüllkurve steuern. Die Hüllkurve bestimmt den Frequenzparameter relativ. Die Parameter sind:
+
+| Tiefpass      | Hochpass      | Bandpass      | Beschreibung              |
+|---------------|---------------|---------------|---------------------------|
+| lpattack/lpa  | hpattack/hpa  | bpattack/bpa  | Schwellzeit in Sekunden   |
+| lpdecay/lpd   | hpdecay/hpd   | bpdecay/bpd   | Abklingzeit in Sekunden   |
+| lpsustain/lps | hpsustain/hps | bpsustain/bps | Haltewert als Faktor      |
+| lprelease/lpr | hprelease/hpr | bprelease/bpr | Nachklingzeit in Sekunden |
+| lpenv/lpe     | hpenv/hpe     | bpenv/bpe     | Intensität als Faktor     |
+
+Beispiel:
+<MiniRepl name="lp_adsr" tune={`$: note("a4 ~")
+     .lpf(100)    // Normale Cutoff-Frequenz
+     .release(1)  // Nachklingzeit (Lautstärke) in Sekunden
+     .lpa(0.2)    // Schwellzeit
+     .lpd(0.2)    // Abklingzeit
+     .lps(0.125)  // Haltewert: ein Viertel von 800 Hz (200 Hz)
+     .lpr(0.5)    // Nachklingzeit
+     .lpenv(16)   // Intensität: Bis aufs vierfache (800 Hz)
+`}/>
+
+
+
+<LinkButton icon='right-arrow' href="../../exercises/08_effects/">Übungen: Lernt, den Gesamtklang zu verändern!</LinkButton>
