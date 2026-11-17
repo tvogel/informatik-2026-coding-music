@@ -47,6 +47,7 @@ export default defineConfig({
           },
           { label: 'Harmonien', slug: 'guides/harmonies' },
           { label: 'Effekte', slug: 'guides/effects' },
+          { label: 'Arrangieren', slug: 'guides/arranging' },
         ],
       },
       {

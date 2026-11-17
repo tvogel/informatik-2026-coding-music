@@ -1,0 +1,244 @@
+---
+title: Arrangieren
+description: Unterschiedliche Teile eines Stücks anordnen
+---
+import { Card, CardGrid } from "@astrojs/starlight/components";
+import LinkButton from "../../../components/LinkButton.astro";
+import LinkCard from "../../../components/LinkCard.astro";
+import MiniRepl from "../../../components/MiniRepl.astro";
+
+Ihr habt jetzt viel gelernt, um Abschnitte, Loops zu erzeugen, die für sich gut klingen. Oft möchte man aber in einem Stück mehrere Teile voneinander abgrenzen, z.B. um typische Songstrukturen zu nutzen:
+
+| Intro | Vers | Refrain | Vers | Refrain | Bridge | Refrain | Outro |
+|-------|------|---------|------|---------|--------|---------|-------|
+
+Wie so oft in Strudel, gibt es mehrere Ansätze, mit denen man das erreichen kann.
+
+## `arrange()`
+
+Mit `arrange()` kann man beliebig viele Wiederholungen von verschiedenen Teilen aneinanderfügen. Besonders nützlich ist dabei `silence`, ein vordefinierter Zyklus, der schlicht nichts enthält.
+
+In die Klammern von `arrange()` schreibt man eine Folge von *Paaren* (Listen mit je zwei Elementen), die nacheinander abgespielt werden. Das erste Element gibt dabei jeweils an, wie viele Zyklen lang das zweite Elemente gespielt werden soll.
+
+Praktisch dabei: Instrumenten-Auswahl, Effekte, usw. kann man hinter den `arrange()`-Befehl schreiben. Er wirkt dann auf alle Teile zusammen!
+
+<MiniRepl name="arrange" tune={`$: arrange(
+    [40, s("bd sd, [~ hh*2]*2")],
+    [1, s("cr").gain(0.001)],
+    [1, s("~!3 cr")],
+  )
+  $: arrange(
+    [2, silence],
+    [2, n(irand(14)).struct("<[x x*2 [~ x]!2] [x!2 x*3 x*2]>").scale("c2:minor:pentatonic").s("crow")],
+    [6, silence],
+    [2, n(irand(14)).struct("<[x x*2 [~ x]!2] [x!2 x*3 x*2]>").scale("c2:minor:pentatonic").s("crow")],
+    [28, silence],
+    [2, n(irand(14)).struct("<[x x*2 [~ x]!2] [x!2 x*3 x*2]>").scale("c2:minor:pentatonic").s("crow")],
+  ).room(0.2).roomsize(2)
+
+  $: arrange(
+    [4, n("<[3 2 1 0] [0 [~ 0]!3]>").scale("c2:harmonic:minor").s("gm_synth_bass_2")],
+    [36, n("<[2 0 7 0] [0 [~ 0]!3]>").scale("c2:harmonic:minor").s("gm_synth_bass_2")],
+    [2, silence]
+  ).room(0.5)
+
+  $: arrange(
+    [4, silence],
+    [8, chord("<Cm Dm7b5 Fm G7>").voicing().struct("[~ x]*4").s("gm_electric_guitar_clean").gain(0.4)],
+    [28, chord("<Cm Fm Ab9 G7>").voicing().struct("[~ x]*4").s("gm_electric_guitar_clean").gain(0.4)],
+    [2, silence],
+  )
+
+  $: arrange(
+    [20,silence],
+    [12, n(irand(7).add(-2)).struct("<<[x!3 -] [x*3 x!2 -]> [x@4 | x*2]>").scale("c5:minor:pentatonic")],
+    [1, note("c5")],
+    [9, silence],
+  ).s("gm_flute:2").early(.025)
+  all(x => x.filterWhen(t => t < 42))
+`}/>
+
+:::tip
+Wenn man am Ende nicht möchte, dass das Lied von Anfang anfängt, kann man alle vorhandenen Spuren mit `all()` und `.filterWhen()` abschalten.
+
+Das geht so: `all()` gibt man eine *Funktion*, die für jede Spur, die mit `$:` deklariert wurde, aufgerufen wird.
+
+In dem Beispiel oben ruft diese Funktion dann für jede Spur *x* `x.filterWhen(t => t < 42)` auf.
+
+Der Funktion `.filterWhen()` gibt man wiederum eine Funktion mit, der Strudel die aktuelle Zeit (in Zyklen) mitgibt. In unserem Fall schaut die Funktion, ob die Zeit noch kleiner ist als 42. Wenn nein, dann filtert Strudel alle Töne weg. Das heißt, intern läuft das Stück noch weiter, aber man hört eben nichts mehr davon.
+
+Das heißt, um das Stück neu zu starten, muss man es erst stoppen.
+:::
+
+:::tip[Noch ein Tipp!]
+Bei langen Stücken ist es nervig, sich bei Veränderungen alles immer nochmal anzuhören. Auch dafür ist `all()` eine große Hilfe, diesmal kombiniert mit dem Befehl `.early()`.
+
+`.early()` gibt man eine Zeit (in Zyklen) mit, um die man das entsprechende Muster früher hören will. Arbeitet man mit `arrange()`, dann spult man um die entsprechende Anzahl an Takten vor.
+
+Möchte man bei dem Beispiel oben direkt den Flöten-Part höre, geht das mit:
+```js
+all(x => x.early(20))
+```
+:::
+
+### Mehr Übersicht mit Variablen
+
+Um das alles etwas besser lesbar zu machen, ist es hilfreich, die unterschiedlichen Spuren griffig zu benennen. Außerdem kann man Muster, die oft vorkommen in einer Variable speichern und mehrfach benutzen.
+
+Vor- und Nachteil: Wenn man das Muster an einer Stelle ändert, ändert es sich an jeder Stelle im Arrangement. Man kann es ja aber jederzeit immer noch kopieren und verändern, wenn man mag.
+
+<MiniRepl name="arrange_variables" tune={`$beat: arrange(
+    [40, s("bd sd, [~ hh*2]*2")],
+    [1, s("cr").gain(0.001)],
+    [1, s("~!3 cr")],
+  )
+
+  const crowScratch = n(irand(14))
+    .struct("<[x x*2 [~ x]!2] [x!2 x*3 x*2]>")
+    .scale("c2:minor:pentatonic")
+    .s("crow")
+  $crowScratch: arrange(
+    [2, silence],
+    [2, crowScratch],
+    [6, silence],
+    [2, crowScratch],
+    [28, silence],
+    [2, crowScratch],
+  ).room(0.2).roomsize(2)
+
+  $bass: arrange(
+    [4, n("<[3 2 1 0] [0 [~ 0]!3]>").scale("c2:harmonic:minor").s("gm_synth_bass_2")],
+    [36, n("<[2 0 7 0] [0 [~ 0]!3]>").scale("c2:harmonic:minor").s("gm_synth_bass_2")],
+    [2, silence]
+  ).room(0.5)
+
+  $rhythmGuitar: arrange(
+    [4, silence],
+    [8, chord("<Cm Dm7b5 Fm G7>").voicing().struct("[~ x]*4").s("gm_electric_guitar_clean").gain(0.4)],
+    [28, chord("<Cm Fm Ab9 G7>").voicing().struct("[~ x]*4").s("gm_electric_guitar_clean").gain(0.4)],
+    [2, silence],
+  )
+
+  $delusionalFlute: arrange(
+    [20,silence],
+    [12, n(irand(7).add(-2)).struct("<<[x!3 -] [x*3 x!2 -]> [x@4 | x*2]>").scale("c5:minor:pentatonic")],
+    [1, note("c5")],
+    [9, silence],
+  ).s("gm_flute:2").early(.025)
+
+  all(x => x.filterWhen(t => t < 42))
+`}/>
+
+## `.mask()`
+
+Eine andere Methode ist, für ein Muster zu definieren, wann es zu hören ist, und wann nicht. Man gibt `.mask()` ein Muster mit, das Nullen und Einsen produziert. Null heißt still, Eins heißt hörbar:
+
+<MiniRepl name="mask" tune={`$basicBeat: s("bd sd, [~ hh*2]*2")
+    .mask("<1!40 0!2>")
+  $outroBeat: s("<cr [~!3 cr]>").gain("<0.001 1>")
+    .mask("<0!40 1!2>")
+
+  $crowScratch: n(irand(14))
+    .struct("<[x x*2 [~ x]!2] [x!2 x*3 x*2]>")
+    .scale("c2:minor:pentatonic").s("crow")
+    .room(0.2).roomsize(2)
+    .mask("<0!2 1!2 0!6 1!2 0!28 1!2>")
+
+  $bass1: n("<[3 2 1 0] [0 [~ 0]!3]>").scale("c2:harmonic:minor").s("gm_synth_bass_2").room(0.5)
+    .mask("<1!4 0!38>")
+  $bass2: n("<[2 0 7 0] [0 [~ 0]!3]>").scale("c2:harmonic:minor").s("gm_synth_bass_2").room(0.5)
+    .mask("<0!4 1!36 0!2>")
+
+  $rhythmGuitar1: chord("<Cm Dm7b5 Fm G7>").voicing().struct("[~ x]*4").s("gm_electric_guitar_clean").gain(0.4)
+    .mask("<0!4 1!8 0!28 0!2>")
+
+  $rhythmGuitar2: chord("<Cm Fm Ab9 G7>").voicing().struct("[~ x]*4").s("gm_electric_guitar_clean").gain(0.4)
+    .mask("<0!4 0!8 1!28 0!2>")
+
+  $delusionalFlute1: n(irand(7).add(-2))
+    .struct("<<[x!3 -] [x*3 x!2 -]> [x@4 | x*2]>")
+    .scale("c5:minor:pentatonic").s("gm_flute:2").early(.025)
+    .mask("<0!20 1!12 0!10>")
+  $delusionalFlute2: note("c5")
+    .scale("c5:minor:pentatonic").s("gm_flute:2").early(.025)
+    .mask("<0!32 1 0!9>")
+
+  all(x => x.filterWhen(t => t < 42))
+`}/>
+
+
+
+## `.pick()`
+
+Eine dritte Möglichkeit in Strudel ist, dass man Muster mit `.pick()` aus Listen und Verzeichnissen auswählen kann.
+
+Listen schreibt man so:
+```js
+[ element0, element1, element2, ... ]
+```
+bzw. auf mehrere Zeilen:
+```js
+[
+   element0,
+   element1,
+   element2,
+   ...
+]
+```
+
+Und Verzeichnisse als JavaScript-Objekte:
+```js
+{
+  name1: element1,
+  name2: element2,
+  ...
+}
+```
+
+Für `.pick()` schreibt man dann ein Muster, das entweder Listen-Indizes oder Verzeichnis-Namen produziert und damit die entsprechenden Klangmuster auswählt.
+
+Es wird wahrscheinlich am Beispiel klar:
+<MiniRepl name="pick" tune={`const beats = {
+    basic: s("bd sd, [~ hh*2]*2"),
+    outro: s("<cr [~!3 cr]>").gain("<0.001 1>"),
+  }
+  $beat: "<basic!40 outro!2>".pick(beats)
+
+  const crowScratch = n(irand(14))
+    .struct("<[x x*2 [~ x]!2] [x!2 x*3 x*2]>")
+    .scale("c2:minor:pentatonic").s("crow")
+    .room(0.2).roomsize(2)
+
+  // hier wird spontan eine Liste mit nur einem Element gemacht:
+  $crowScratch: "<~!2 0!2 ~!6 0!2 ~!28 0!2>".pick([crowScratch])
+
+  const bassRuns = [
+    n("<[3 2 1 0] [0 [~ 0]!3]>"),
+    n("<[2 0 7 0] [0 [~ 0]!3]>")
+  ]
+
+  $bass: "<0!4 1!36 ~!2>".pick(bassRuns)
+    .scale("c2:harmonic:minor").s("gm_synth_bass_2").room(0.5)
+
+  const guitarChords = [
+    chord("<Cm Dm7b5 Fm G7>"),
+    chord("<Cm Fm Ab9 G7>"),
+  ]
+
+  $rhythmGuitar: "<~!4 0!8 1!28 ~!2>".pick(guitarChords)
+    .voicing()
+    .struct("[~ x]*4")
+    .s("gm_electric_guitar_clean").gain(0.4)
+
+  const fluteMelody = {
+    run: n(irand(7).add(-2))
+      .struct("<<[x!3 -] [x*3 x!2 -]> [x@4 | x*2]>"),
+    final: n("0"),
+  }
+  $delusionalFlute: "<~!20 run!12 final ~!9>".pick(fluteMelody)
+    .scale("c5:minor:pentatonic").s("gm_flute:2").early(.025)
+
+  all(x => x.filterWhen(t => t < 42))
+`}/>
+
+<LinkButton icon='right-arrow' href="../../exercises/09_arranging/">Übungen zum Arrangieren</LinkButton>

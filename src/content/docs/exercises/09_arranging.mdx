@@ -1,0 +1,93 @@
+---
+title: "Übungen 9: Arrangieren"
+description: Songs aus Teilen zusammensetzen
+---
+import LinkButton from '../../../components/LinkButton.astro';
+import LinkCard from '../../../components/LinkCard.astro';
+import MiniRepl from "../../../components/MiniRepl.astro";
+import dedent from "dedent";
+import Checklist from "../../../components/Checklist.astro";
+
+Hier habe ich für Euch ein paar Bausteine zusammengestellt, die Ihr nach belieben kombinieren könnt! Am Anfang hört Ihr nichts! In den Mustern vor dem jeweiligen `.pick()` könnt Ihr Euch entsprechende Parts auswählen - auch eine gute Baustelle, um Euch an die Zufallselemente zu erinnern! Manche Bausteine sind in Verzeichnissen organisiert, manche in Listen, Ihr braucht also manchmal Zahlen, manchmal Worte um sie auszuwählen. Fügt nach Belieben neue Bausteine hinzu!
+
+  <MiniRepl name="arranging" tune={`const beats = {
+    basic: s("bd sd <bd bd*2> sd, hh*8"),
+    crazyhat: stack(s("bd sd <bd bd*2> sd"), s("hh*16").gain(rand)),
+    fillin: s("bd bd*4 bd*6 bd*8")
+  }
+
+  $beat: "<~>".pick(beats).n(6)
+    .compressor(-20,20,10,.01,.5).postgain(1.5)
+    .duckorbit("2").duckdepth(0.7)
+
+  const bassRuns = {
+    straight: n("0*4"),
+    euclidean: n("0(3,8)"),
+    quarts: n("[0 3 0 3 ~!4]")
+  }
+
+  $bass: "<~>".pick(bassRuns)
+    .scale("e1:major").s("gm_synth_bass_2")
+    .detune("-0.02,0,0.02")
+    .orbit(2)
+
+  const tops = [
+    n("[0 -1 0 -2]*2"),
+    n("[7 5 3 1 6 4 2 0]*2"),
+    n("[-1|0|1|2](7,16)").gain(rand)
+  ]
+
+  $top: "<~>".pick(tops).scale("e1:major").s("metal:0").room(1).delay(0.3)
+
+  const drone = [
+    n("0"),
+    n("<7 8 4 11>")
+  ]
+
+  $drone: "<~>".pick(drone).scale("e1:major").sound("pulse").pw(0.5).pwsweep(1).lpf(1000)
+`}/>
+
+
+  {/* <MiniRepl name="arranging" tune={`const beats = {
+    basic: s("bd sd <bd bd*2> sd, hh*8"),
+    crazyhat: stack(s("bd sd <bd bd*2> sd"), s("hh*16").gain(rand)),
+    fillin: s("bd bd*4 bd*6 bd*8")
+  }
+
+  $beat: "<[basic crazyhat]!7 [basic fillin]>".pick(beats).n(6)
+    .compressor(-20,20,10,.01,.5).postgain(1.5)
+    .duckorbit("2").duckdepth(0.7)
+
+  const bassRuns = {
+    straight: n("0*4"),
+    euclidean: n("0(3,8)"),
+    quarts: n("[0 3 0 3 ~!4]")
+  }
+
+  $bass: "straight | euclidean | quarts".pick(bassRuns)
+    .scale("e1:major").s("gm_synth_bass_2")
+    .detune("-0.02,0,0.02")
+    .orbit(2)
+
+  const tops = [
+    n("[0 -1 0 -2]*2"),
+    n("[7 5 3 1 6 4 2 0]*2"),
+    n("[-1|0|1|2](7,16)").gain(rand)
+  ]
+
+  $top: "<0 ~!3 1!2 ~!2 2!3 ~>".pick(tops).scale("e1:major").s("metal:0").room(1).delay(0.3)
+
+  const drone = [
+    n("0"),
+    n("<7 8 4 11>")
+  ]
+
+  $drone: "~".pick(drone).scale("e1:major").sound("pulse").pw(0.5).pwsweep(1).lpf(1000)
+`}/> */}
+
+{/*
+## Weiter geht es mit *Harmonien*
+
+Das mit den ganzen Intervallen auszuprobieren ist ziemlich mühsam, aber gibt natürlich reichlich Raum für kreative Entdeckungen. Es gibt aber Abfolgen, an die wir ziemlich gewohnt sind und die auch Freude machen zu erkunden:
+
+<LinkButton icon='right-arrow' href="../../guides/harmonies/">Harmonien</LinkButton> */}
