@@ -18,3 +18,16 @@
 .sl-markdown-content math * {
   margin-top: 0;
 }
+
+/* On short screens, let the navigation scroll away instead of covering content. */
+@media screen and (max-height: 500px) {
+  .page > .header,
+  .sl-menu-button,
+  mobile-starlight-toc > nav {
+    position: absolute;
+  }
+
+  :root {
+    scroll-padding-top: 1.5rem;
+  }
+}
